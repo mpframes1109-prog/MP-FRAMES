@@ -12,8 +12,8 @@ window.login = async function () {
     const email = document.getElementById("email").value.trim();
     const password = document.getElementById("password").value.trim();
 
-    if (!email || !password) {
-        alert("Enter Email and Password");
+    if (email === "" || password === "") {
+        alert("Please enter email and password");
         return;
     }
 
@@ -23,14 +23,21 @@ window.login = async function () {
 
         alert("Login Successful");
 
-        window.location.href = "mp-admin-dashboard-2026.html";
+        window.location.href = "admin.html";
 
     } catch (error) {
-
-        alert("Invalid Email or Password");
-
+      
+      
         console.log(error);
+alert(error.code + "\n" + error.message);
+
+
+
+
+
+
+
 
     }
 
-};
+}
