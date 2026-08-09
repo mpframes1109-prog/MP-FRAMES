@@ -1,0 +1,9 @@
+{
+  "name": "mp-frames-payment",
+  "version": "1.0.0",
+  "type": "module",
+  "dependencies": {
+    "firebase-admin": "^14.2.0",
+    "razorpay": "^2.9.6"
+  }
+}
