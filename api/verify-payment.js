@@ -3,7 +3,6 @@ import { initializeApp, cert, getApps } from "firebase-admin/app";
 import { getFirestore } from "firebase-admin/firestore";
 import { getMessaging } from "firebase-admin/messaging";
 
-// Firebase Admin initialization
 if (!getApps().length) {
     const serviceAccount =
         JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
@@ -16,11 +15,11 @@ if (!getApps().length) {
 const db = getFirestore();
 const messaging = getMessaging();
 
-
 export default async function handler(req, res) {
 
     if (req.method !== "POST") {
         return res.status(405).json({
+            success: false,
             error: "Method not allowed"
         });
     }
@@ -33,8 +32,6 @@ export default async function handler(req, res) {
             razorpay_signature
         } = req.body;
 
-
-        // Check payment details
         if (
             !razorpay_order_id ||
             !razorpay_payment_id ||
@@ -46,18 +43,18 @@ export default async function handler(req, res) {
             });
         }
 
+        const secret = process.env.RAZORPAY_KEY_SECRET;
 
-        // Razorpay secret
-        const secret =
-            process.env.RAZORPAY_KEY_SECRET;
+        if (!secret) {
+            throw new Error(
+                "RAZORPAY_KEY_SECRET is not configured"
+            );
+        }
 
-
-        // Create signature
         const body =
             razorpay_order_id +
             "|" +
             razorpay_payment_id;
-
 
         const expectedSignature =
             crypto
@@ -65,14 +62,7 @@ export default async function handler(req, res) {
                 .update(body)
                 .digest("hex");
 
-
-        // Verify signature
-        const isValid =
-            expectedSignature ===
-            razorpay_signature;
-
-
-        if (!isValid) {
+        if (expectedSignature !== razorpay_signature) {
 
             return res.status(400).json({
                 success: false,
@@ -81,10 +71,17 @@ export default async function handler(req, res) {
 
         }
 
-
         // =====================================
         // PAYMENT VERIFIED ✅
-        // SEND ADMIN NOTIFICATION
+        // =====================================
+
+        console.log(
+            "Payment verified:",
+            razorpay_payment_id
+        );
+
+        // =====================================
+        // GET ADMIN FCM TOKENS
         // =====================================
 
         const snapshot =
@@ -92,12 +89,13 @@ export default async function handler(req, res) {
                 .collection("adminNotificationTokens")
                 .get();
 
+        const tokens = snapshot.docs
+            .map(doc => doc.data().token)
+            .filter(Boolean);
 
-        const tokens =
-            snapshot.docs
-                .map(doc => doc.data().token)
-                .filter(Boolean);
-
+        // =====================================
+        // SEND ADMIN NOTIFICATION
+        // =====================================
 
         if (tokens.length > 0) {
 
@@ -105,7 +103,8 @@ export default async function handler(req, res) {
 
                 notification: {
                     title: "🛒 New Order - MP Frames",
-                    body: "Payment successful! A new customer order has been received."
+                    body:
+                        "Payment successful! A new customer order has been received."
                 },
 
                 data: {
@@ -117,7 +116,6 @@ export default async function handler(req, res) {
                 tokens: tokens
             };
 
-
             try {
 
                 const result =
@@ -126,8 +124,13 @@ export default async function handler(req, res) {
                     );
 
                 console.log(
-                    "FCM notification sent:",
+                    "FCM notifications sent:",
                     result.successCount
+                );
+
+                console.log(
+                    "FCM notifications failed:",
+                    result.failureCount
                 );
 
             } catch (notificationError) {
@@ -136,7 +139,6 @@ export default async function handler(req, res) {
                     "FCM notification error:",
                     notificationError
                 );
-
             }
 
         } else {
@@ -147,9 +149,8 @@ export default async function handler(req, res) {
 
         }
 
-
         // =====================================
-        // PAYMENT SUCCESS RESPONSE
+        // PAYMENT SUCCESS
         // =====================================
 
         return res.status(200).json({
@@ -164,7 +165,6 @@ export default async function handler(req, res) {
 
         });
 
-
     } catch (error) {
 
         console.error(
@@ -172,16 +172,15 @@ export default async function handler(req, res) {
             error
         );
 
-
         return res.status(500).json({
 
             success: false,
 
             error:
-                "Verification server error"
+                error.message ||
+                "Payment verification server error"
 
         });
 
     }
-
 }
