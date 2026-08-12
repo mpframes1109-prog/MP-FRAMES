@@ -1,94 +1,308 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+
 <head>
-    <title>MP Frames - Orders</title>
 
-    <style>
-        body{
-            font-family:Arial;
-            background:#f5f5f5;
-            padding:30px;
-        }
+<meta charset="UTF-8">
 
-        h1{
-            text-align:center;
-        }
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0">
 
-        table{
-            width:100%;
-            border-collapse:collapse;
-            background:white;
-        }
+<title>MP Frames - Customer Orders</title>
 
-        th,td{
-            border:1px solid #ddd;
-            padding:12px;
-            text-align:center;
-        }
 
-        th{
-            background:#000;
-            color:white;
-        }
+<style>
 
-        img{
-            width:80px;
-            height:80px;
-            object-fit:cover;
-            border-radius:8px;
-        }
+*{
+    box-sizing:border-box;
+}
 
-        select{
-            padding:5px;
-        }
 
-        button{
-            background:#25D366;
-            color:white;
-            border:none;
-            padding:8px 12px;
-            cursor:pointer;
-        }
-    </style>
+body{
+
+    margin:0;
+
+    font-family:
+        Arial,
+        sans-serif;
+
+    background:#f4f6f8;
+
+    color:#222;
+
+}
+
+
+header{
+
+    background:#111;
+
+    color:white;
+
+    padding:22px;
+
+    text-align:center;
+
+}
+
+
+header h1{
+
+    margin:0;
+
+    font-size:28px;
+
+}
+
+
+.container{
+
+    width:95%;
+
+    max-width:1500px;
+
+    margin:30px auto;
+
+}
+
+
+.orders-card{
+
+    background:white;
+
+    border-radius:14px;
+
+    padding:20px;
+
+    box-shadow:
+        0 5px 25px
+        rgba(0,0,0,.08);
+
+    overflow-x:auto;
+
+}
+
+
+table{
+
+    width:100%;
+
+    border-collapse:collapse;
+
+    min-width:1100px;
+
+}
+
+
+th{
+
+    background:#111;
+
+    color:white;
+
+    padding:15px;
+
+    font-size:14px;
+
+}
+
+
+td{
+
+    padding:14px;
+
+    border-bottom:
+        1px solid #eee;
+
+    text-align:center;
+
+    vertical-align:middle;
+
+}
+
+
+tr:hover{
+
+    background:#fafafa;
+
+}
+
+
+.order-image{
+
+    width:90px;
+
+    height:90px;
+
+    object-fit:cover;
+
+    border-radius:10px;
+
+    border:1px solid #ddd;
+
+}
+
+
+small{
+
+    color:#777;
+
+}
+
+
+.status-select{
+
+    padding:9px;
+
+    border-radius:7px;
+
+    border:1px solid #ccc;
+
+    font-weight:bold;
+
+}
+
+
+button,
+.download-btn{
+
+    border:none;
+
+    border-radius:7px;
+
+    padding:9px 12px;
+
+    cursor:pointer;
+
+    text-decoration:none;
+
+    display:inline-block;
+
+    margin:3px;
+
+    font-weight:bold;
+
+}
+
+
+.view-btn{
+
+    background:#2563eb;
+
+    color:white;
+
+}
+
+
+.download-btn{
+
+    background:#16a34a;
+
+    color:white;
+
+}
+
+
+.update-btn{
+
+    background:#111;
+
+    color:white;
+
+}
+
+
+.view-btn:hover{
+
+    background:#1d4ed8;
+
+}
+
+
+.download-btn:hover{
+
+    background:#15803d;
+
+}
+
+
+.update-btn:hover{
+
+    background:#333;
+
+}
+
+
+.actions{
+
+    min-width:220px;
+
+}
+
+
+</style>
+
 </head>
+
 
 <body>
 
-<h1>Customer Orders</h1>
 
-<table>
+<header>
 
-<thead>
+    <h1>MP Frames — Customer Orders</h1>
 
-<tr>
+</header>
 
-<th>Name</th>
 
-<th>Phone</th>
+<div class="container">
 
-<th>Address</th>
+    <div class="orders-card">
 
-<th>Frame</th>
+        <table>
 
-<th>Message</th>
+            <thead>
 
-<th>Photo</th>
+                <tr>
 
-<th>Status</th>
+                    <th>Customer</th>
 
-<th>Update</th>
+                    <th>Phone</th>
 
-</tr>
+                    <th>Address</th>
 
-</thead>
+                    <th>Frame</th>
 
-<tbody id="ordersTable">
+                    <th>Price</th>
 
-</tbody>
+                    <th>Customer Image</th>
 
-</table>
+                    <th>Status</th>
 
-<script type="module" src="admin-orders.js"></script>
+                    <th>Actions</th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody id="ordersTable">
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+
+<script
+    type="module"
+    src="admin-orders.js">
+</script>
+
 
 </body>
 
