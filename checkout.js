@@ -47,10 +47,6 @@ window.placeOrder = async function () {
 
     const photoFile = photoInput.files[0];
 
-    // Allow only images
-    if (!photoFile.type.startsWith("image/")) {
-        alert("Please select an image file");
-        return;
     }
 
     // 5 MB limit
