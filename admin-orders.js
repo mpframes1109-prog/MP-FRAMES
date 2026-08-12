@@ -208,49 +208,38 @@ window.viewImage = function(url) {
 
 
 /* UPDATE STATUS */
-
 window.updateStatus = async function(id) {
 
     try {
 
-        const select =
-            document.getElementById(`status-${id}`);
+        const select = document.getElementById(`status-${id}`);
+        const button = event.target;
 
         const status = select.value;
 
+        button.disabled = true;
+        button.innerText = "Updating...";
 
-        await updateDoc(
-            doc(db, "orders", id),
-            {
-                status: status
-            }
-        );
+        await updateDoc(doc(db, "orders", id), {
+            status: status
+        });
 
+        button.disabled = false;
+        button.innerText = "Updated";
 
-        alert(
-            `Order status updated to ${status}`
-        );
-
-
-        loadOrders();
-
+        setTimeout(() => {
+            button.innerText = "Update";
+        }, 1500);
 
     } catch (error) {
 
-        console.error(
-            "Status update error:",
-            error
-        );
+        console.error("Status update error:", error);
 
-        alert(
-            "Failed to update status\n\n" +
-            error.message
-        );
+        alert("Update failed: " + error.message);
 
+        event.target.disabled = false;
+        event.target.innerText = "Update";
     }
 
 };
 
-
-
-loadOrders();
