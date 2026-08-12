@@ -1,76 +1,256 @@
 import { db } from "./firebase.js";
 
 import {
-  collection,
-  getDocs,
-  doc,
-  updateDoc
+    collection,
+    getDocs,
+    doc,
+    updateDoc,
+    query,
+    orderBy
 } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+
 
 const table = document.getElementById("ordersTable");
 
+
 async function loadOrders() {
 
-  table.innerHTML = "";
-
-  const snapshot = await getDocs(collection(db, "orders"));
-
-  snapshot.forEach((document) => {
-
-    const order = document.data();
-
-    table.innerHTML += `
-      <tr>
-
-        <td>${order.customerName || ""}</td>
-
-        <td>${order.phone || ""}</td>
-
-        <td>${order.address || ""}</td>
-
-        <td>${order.frameName || ""}</td>
-
-        <td>${order.message || ""}</td>
-
-        <td>
-          ${
-            order.photo
-              ? `<img src="${order.photo}" width="80" height="80">`
-              : "No Photo"
-          }
-        </td>
-
-        <td>
-          <select id="status-${document.id}">
-            <option value="Pending" ${order.status === "Pending" ? "selected" : ""}>Pending</option>
-            <option value="Confirmed" ${order.status === "Confirmed" ? "selected" : ""}>Confirmed</option>
-            <option value="Delivered" ${order.status === "Delivered" ? "selected" : ""}>Delivered</option>
-          </select>
-        </td>
-
-        <td>
-          <button onclick="updateStatus('${document.id}')">
-            Update
-          </button>
-        </td>
-
-      </tr>
+    table.innerHTML = `
+        <tr>
+            <td colspan="9">Loading orders...</td>
+        </tr>
     `;
 
-  });
+
+    try {
+
+        const ordersQuery = query(
+            collection(db, "orders"),
+            orderBy("createdAt", "desc")
+        );
+
+        const snapshot = await getDocs(ordersQuery);
+
+
+        if (snapshot.empty) {
+
+            table.innerHTML = `
+                <tr>
+                    <td colspan="9">
+                        No customer orders found
+                    </td>
+                </tr>
+            `;
+
+            return;
+        }
+
+
+        table.innerHTML = "";
+
+
+        snapshot.forEach((document) => {
+
+            const order = document.data();
+
+            const photo = order.photo
+                ? `
+                    <img
+                        src="${order.photo}"
+                        class="order-image"
+                        alt="Customer Photo"
+                    >
+                  `
+                : "No Photo";
+
+
+            const viewButton = order.photo
+                ? `
+                    <button
+                        class="view-btn"
+                        onclick="viewImage('${order.photo}')">
+                        👁️ View
+                    </button>
+                  `
+                : "";
+
+
+            const downloadButton = order.photo
+                ? `
+                    <a
+                        class="download-btn"
+                        href="${order.photo}"
+                        target="_blank"
+                        download>
+                        ⬇️ Download
+                    </a>
+                  `
+                : "";
+
+
+            table.innerHTML += `
+
+                <tr>
+
+                    <td>
+                        <strong>
+                            ${order.customerName || ""}
+                        </strong>
+                    </td>
+
+
+                    <td>
+                        ${order.phone || ""}
+                    </td>
+
+
+                    <td>
+                        ${order.address || ""}
+                    </td>
+
+
+                    <td>
+                        ${order.frameName || ""}
+                        <br>
+                        <small>
+                            Qty: ${order.quantity || 1}
+                        </small>
+                    </td>
+
+
+                    <td>
+                        ₹${order.price || 0}
+                    </td>
+
+
+                    <td>
+                        ${photo}
+                    </td>
+
+
+                    <td>
+
+                        <select
+                            id="status-${document.id}"
+                            class="status-select">
+
+                            <option
+                                value="Pending"
+                                ${order.status === "Pending" ? "selected" : ""}>
+                                Pending
+                            </option>
+
+                            <option
+                                value="Confirmed"
+                                ${order.status === "Confirmed" ? "selected" : ""}>
+                                Confirmed
+                            </option>
+
+                            <option
+                                value="Delivered"
+                                ${order.status === "Delivered" ? "selected" : ""}>
+                                Delivered
+                            </option>
+
+                        </select>
+
+                    </td>
+
+
+                    <td class="actions">
+
+                        ${viewButton}
+
+                        ${downloadButton}
+
+                        <button
+                            class="update-btn"
+                            onclick="updateStatus('${document.id}')">
+                            ✅ Update
+                        </button>
+
+                    </td>
+
+                </tr>
+
+            `;
+
+        });
+
+
+    } catch (error) {
+
+        console.error("Load orders error:", error);
+
+        table.innerHTML = `
+            <tr>
+                <td colspan="9">
+                    ❌ Failed to load orders
+                    <br>
+                    ${error.message}
+                </td>
+            </tr>
+        `;
+    }
 
 }
 
-window.updateStatus = async function(id) {
 
-  const status = document.getElementById(`status-${id}`).value;
 
-  await updateDoc(doc(db, "orders", id), {
-    status: status
-  });
+/* VIEW IMAGE */
 
-  alert("Status Updated");
+window.viewImage = function(url) {
+
+    window.open(url, "_blank");
 
 };
+
+
+
+/* UPDATE STATUS */
+
+window.updateStatus = async function(id) {
+
+    try {
+
+        const select =
+            document.getElementById(`status-${id}`);
+
+        const status = select.value;
+
+
+        await updateDoc(
+            doc(db, "orders", id),
+            {
+                status: status
+            }
+        );
+
+
+        alert(
+            `Order status updated to ${status}`
+        );
+
+
+        loadOrders();
+
+
+    } catch (error) {
+
+        console.error(
+            "Status update error:",
+            error
+        );
+
+        alert(
+            "Failed to update status\n\n" +
+            error.message
+        );
+
+    }
+
+};
+
+
 
 loadOrders();
