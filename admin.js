@@ -1,265 +1,66 @@
-import { app, db } from "./firebase.js";
+let products = JSON.parse(localStorage.getItem("products")) || [];
 
-import {
-    getAuth,
-    onAuthStateChanged,
-    signOut
-} from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+function addProduct() {
 
-import {
-    collection,
-    addDoc,
-    getDocs,
-    deleteDoc,
-    doc
-} from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+    const name = document.getElementById("name").value;
+    const price = document.getElementById("price").value;
+    const image = document.getElementById("image").value;
 
-const auth = getAuth(app);
-
-const productList = document.getElementById("product-list");
-
-
-// ===============================
-// ADMIN LOGIN CHECK
-// ===============================
-
-onAuthStateChanged(auth, (user) => {
-
-    if (!user) {
-        window.location.href = "login.html";
+    if (!name || !price || !image) {
+        alert("Fill all fields");
+        return;
     }
 
-});
+    products.push({
+        id: Date.now(),
+        name,
+        price,
+        image
+    });
 
+    localStorage.setItem("products", JSON.stringify(products));
 
-// ===============================
-// LOAD PRODUCTS
-// ===============================
+    displayProducts();
 
-async function loadProducts() {
+    document.getElementById("name").value = "";
+    document.getElementById("price").value = "";
+    document.getElementById("image").value = "";
+}
 
-    if (!productList) return;
+function displayProducts() {
 
-    productList.innerHTML = "<p>Loading products...</p>";
+    const list = document.getElementById("product-list");
 
-    try {
+    list.innerHTML = "";
 
-        const snapshot =
-            await getDocs(collection(db, "products"));
+    products.forEach((product, index) => {
 
-        productList.innerHTML = "";
+        list.innerHTML += `
+        <div style="border:1px solid #ddd;padding:15px;margin:15px;max-width:500px;">
+            <img src="${product.image}" width="100"><br><br>
 
-        if (snapshot.empty) {
+            <b>${product.name}</b><br>
 
-            productList.innerHTML =
-                "<p>No products available.</p>";
+            ₹${product.price}<br><br>
 
-            return;
-        }
+            <button onclick="deleteProduct(${index})">
+            Delete
+            </button>
+        </div>
+        `;
 
-
-        snapshot.forEach((document) => {
-
-            const product = document.data();
-
-            productList.innerHTML += `
-
-                <div class="card">
-
-                    <img
-                        src="${product.image || ""}"
-                        width="150"
-                        height="150"
-                        style="object-fit:cover;border-radius:8px;"
-                    >
-
-                    <h3>
-                        ${product.name || ""}
-                    </h3>
-
-                    <p>
-                        <b>Category:</b>
-                        ${product.category || ""}
-                    </p>
-
-                    <p>
-                        <b>Price:</b>
-                        ₹${product.price || 0}
-                    </p>
-
-                    <button
-                        onclick="deleteProduct('${document.id}')">
-                        Delete
-                    </button>
-
-                </div>
-
-            `;
-
-        });
-
-    }
-    catch (error) {
-
-        console.error(
-            "Load products error:",
-            error
-        );
-
-        productList.innerHTML =
-            "<p>Failed to load products.</p>";
-    }
+    });
 
 }
 
+function deleteProduct(index){
 
-// ===============================
-// ADD PRODUCT
-// ===============================
+    products.splice(index,1);
 
-window.addProduct = async function () {
+    localStorage.setItem("products", JSON.stringify(products));
 
-    const name =
-        document.getElementById("name").value.trim();
+    displayProducts();
 
-    const price =
-        document.getElementById("price").value.trim();
+}
 
-    // IMPORTANT:
-    // admin.html uses imagefile
-    const image =
-        document.getElementById("imagefile").value.trim();
-
-    const category =
-        document.getElementById("category").value;
-
-
-    if (!name || !price || !image || !category) {
-
-        alert("Please fill all fields");
-
-        return;
-    }
-
-
-    try {
-
-        await addDoc(
-            collection(db, "products"),
-            {
-
-                name: name,
-
-                price: Number(price),
-
-                image: image,
-
-                category: category,
-
-                createdAt: new Date()
-
-            }
-        );
-
-
-        document.getElementById("name").value = "";
-
-        document.getElementById("price").value = "";
-
-        document.getElementById("imagefile").value = "";
-
-        document.getElementById("category").value = "";
-
-
-        alert("Product Added Successfully");
-
-
-        loadProducts();
-
-    }
-    catch (error) {
-
-        console.error(
-            "Add product error:",
-            error
-        );
-
-        alert(
-            "Product add failed:\n" +
-            error.message
-        );
-
-    }
-
-};
-
-
-// ===============================
-// DELETE PRODUCT
-// ===============================
-
-window.deleteProduct = async function (id) {
-
-    if (!confirm("Delete this product?")) {
-        return;
-    }
-
-
-    try {
-
-        await deleteDoc(
-            doc(db, "products", id)
-        );
-
-        alert("Product Deleted");
-
-        loadProducts();
-
-    }
-    catch (error) {
-
-        console.error(
-            "Delete product error:",
-            error
-        );
-
-        alert(
-            "Delete failed:\n" +
-            error.message
-        );
-
-    }
-
-};
-
-
-// ===============================
-// LOGOUT
-// ===============================
-
-window.logout = async function () {
-
-    try {
-
-        await signOut(auth);
-
-        window.location.href = "login.html";
-
-    }
-    catch (error) {
-
-        console.error(
-            "Logout error:",
-            error
-        );
-
-    }
-
-};
-
-
-// ===============================
-// START
-// ===============================
-
-loadProducts();
+displayProducts();
