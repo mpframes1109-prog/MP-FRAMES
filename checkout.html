@@ -147,6 +147,52 @@ Place Order
 
 </div>
 
-<script type="module" src="checkout.js"></script>
+<script>
+function placeOrder(){
+
+let name=document.getElementById("name").value.trim();
+let phone=document.getElementById("phone").value.trim();
+let address=document.getElementById("address").value.trim();
+
+if(name=="" || phone=="" || address==""){
+    alert("Please fill all details");
+    return;
+}
+
+let cart=JSON.parse(localStorage.getItem("cart"))||[];
+
+if(cart.length==0){
+    alert("Your cart is empty.");
+    return;
+}
+
+let message="🛒 *New Order - MP Frames*%0A%0A";
+
+message+="👤 Name: "+name+"%0A";
+message+="📞 Phone: "+phone+"%0A";
+message+="📍 Address: "+address+"%0A%0A";
+
+let total=0;
+
+message+="🖼 *Products:*%0A";
+
+cart.forEach(item=>{
+
+let qty=item.quantity || 1;
+
+message+="• "+item.name+" x"+qty+" - ₹"+(item.price*qty)+"%0A";
+
+total += item.price*qty;
+
+});
+
+message+="%0A💰 *Total:* ₹"+total;
+
+window.open("https://wa.me/6382667556?text="+message,"_blank");
+
+localStorage.removeItem("cart");
+
+}
+</script>
 </body>
 </html>
