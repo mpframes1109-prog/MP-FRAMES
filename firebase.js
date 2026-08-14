@@ -1,11 +1,8 @@
-import { initializeApp }
-from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
-
-import { getFirestore }
-from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
+import { getFirestore } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
 const firebaseConfig = {
-    apiKey: "AIzaSyDhnMP9qnXdhXAsIP6UIeOjuMz-5OVwdwE",
+    apiKey:"AIzaSyDhnMP9qnXdhXAsIP6UIeOjuMz-5OVwdwE" ,
     authDomain: "mp-frames.firebaseapp.com",
     projectId: "mp-frames",
     storageBucket: "mp-frames.firebasestorage.app",
@@ -15,7 +12,6 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
-
 const db = getFirestore(app);
 
 export { app, db };
