@@ -51,6 +51,7 @@ async function loadOrders() {
 
         console.log("Orders found:", snapshot.size);
 
+
         if (snapshot.empty) {
 
             tbody.innerHTML = `
@@ -85,7 +86,10 @@ async function loadOrders() {
 
                 try {
 
-                    if (typeof order.createdAt.toDate === "function") {
+                    if (
+                        typeof order.createdAt.toDate ===
+                        "function"
+                    ) {
 
                         dateText =
                             order.createdAt
@@ -95,12 +99,13 @@ async function loadOrders() {
                     } else {
 
                         dateText =
-                            new Date(order.createdAt)
-                                .toLocaleString();
+                            new Date(
+                                order.createdAt
+                            ).toLocaleString();
 
                     }
 
-                } catch (e) {
+                } catch (error) {
 
                     dateText = "-";
 
@@ -110,40 +115,93 @@ async function loadOrders() {
 
 
             // ==================================
-            // IMAGE
+            // PHOTO
             // ==================================
 
-            let imageHTML = "No Image";
+            let imageHTML = `
+                <span style="color:#888;">
+                    No Image
+                </span>
+            `;
+
 
             if (order.photo) {
+
+                const photoURL =
+                    escapeHTML(order.photo);
+
 
                 imageHTML = `
                     <div class="photo-actions">
 
                         <img
-                            src="${escapeHTML(order.photo)}"
+                            src="${photoURL}"
                             alt="Customer Photo"
                             class="order-photo"
+                            style="
+                                width:100px;
+                                height:100px;
+                                object-fit:cover;
+                                border-radius:8px;
+                                display:block;
+                                margin:auto;
+                            "
+                            onerror="
+                                this.style.display='none';
+                                this.nextElementSibling.style.display='block';
+                            "
                         >
 
-                        <br>
-
-                        <a
-                            href="${escapeHTML(order.photo)}"
-                            target="_blank"
-                            class="view-btn"
+                        <span
+                            style="
+                                display:none;
+                                color:red;
+                                font-size:12px;
+                            "
                         >
-                            👁 View
-                        </a>
+                            Image failed
+                        </span>
 
-                        <a
-                            href="${escapeHTML(order.photo)}"
-                            target="_blank"
-                            download
-                            class="download-btn"
-                        >
-                            ⬇ Download
-                        </a>
+                        <div style="margin-top:8px;">
+
+                            <a
+                                href="${photoURL}"
+                                target="_blank"
+                                rel="noopener"
+                                style="
+                                    display:inline-block;
+                                    margin:2px;
+                                    padding:6px 10px;
+                                    background:#111;
+                                    color:white;
+                                    text-decoration:none;
+                                    border-radius:5px;
+                                    font-size:12px;
+                                "
+                            >
+                                👁 View
+                            </a>
+
+                            <a
+                                href="${photoURL}"
+                                target="_blank"
+                                rel="noopener"
+                                download
+                                style="
+                                    display:inline-block;
+                                    margin:2px;
+                                    padding:6px 10px;
+                                    background:#198754;
+                                    color:white;
+                                    text-decoration:none;
+                                    border-radius:5px;
+                                    font-size:12px;
+                                "
+                            >
+                                ⬇ Download
+                            </a>
+
+                        </div>
 
                     </div>
                 `;
@@ -157,8 +215,16 @@ async function loadOrders() {
 
             const paymentStatus =
                 order.paymentStatus ||
-                order.status ||
                 "Not Paid";
+
+
+            // ==================================
+            // STATUS
+            // ==================================
+
+            const orderStatus =
+                order.status ||
+                "Pending";
 
 
             // ==================================
@@ -168,19 +234,39 @@ async function loadOrders() {
             row.innerHTML = `
 
                 <td>
-                    ${escapeHTML(order.customerName || "-")}
+                    ${escapeHTML(
+                        order.customerName || "-"
+                    )}
                 </td>
 
                 <td>
-                    ${escapeHTML(order.phone || "-")}
+                    ${escapeHTML(
+                        order.phone || "-"
+                    )}
                 </td>
 
                 <td>
-                    ${escapeHTML(order.address || "-")}
+                    ${escapeHTML(
+                        order.address || "-"
+                    )}
                 </td>
 
                 <td>
-                    ${escapeHTML(order.frameName || "-")}
+                    ${escapeHTML(
+                        order.frameName || "-"
+                    )}
+                </td>
+
+                <td>
+                    ${Number(
+                        order.quantity || 1
+                    )}
+                </td>
+
+                <td>
+                    ₹${Number(
+                        order.price || 0
+                    ).toFixed(2)}
                 </td>
 
                 <td>
@@ -188,35 +274,35 @@ async function loadOrders() {
                 </td>
 
                 <td>
-                    ${order.quantity || 1}
+                    <strong>
+                        ${escapeHTML(
+                            paymentStatus
+                        )}
+                    </strong>
                 </td>
 
                 <td>
-                    ₹${Number(order.price || 0).toFixed(2)}
+                    ${escapeHTML(
+                        orderStatus
+                    )}
                 </td>
 
                 <td>
-                    ${escapeHTML(paymentStatus)}
+                    ${escapeHTML(
+                        order.message || "-"
+                    )}
                 </td>
 
                 <td>
-                    ${escapeHTML(order.status || "Pending")}
+                    ₹${Number(
+                        order.orderTotal || 0
+                    ).toFixed(2)}
                 </td>
 
                 <td>
-                    ${escapeHTML(order.message || "-")}
-                </td>
-
-                <td>
-                    ₹${Number(order.orderTotal || 0).toFixed(2)}
-                </td>
-
-                <td>
-                    ${escapeHTML(order.category || "-")}
-                </td>
-
-                <td>
-                    ${escapeHTML(dateText)}
+                    ${escapeHTML(
+                        dateText
+                    )}
                 </td>
 
             `;
@@ -236,9 +322,7 @@ async function loadOrders() {
 
 
         tbody.innerHTML = `
-
             <tr>
-
                 <td
                     colspan="13"
                     style="
@@ -252,12 +336,12 @@ async function loadOrders() {
 
                     <br><br>
 
-                    ${escapeHTML(error.message)}
+                    ${escapeHTML(
+                        error.message
+                    )}
 
                 </td>
-
             </tr>
-
         `;
 
     }
@@ -269,104 +353,145 @@ async function loadOrders() {
 // AUTH CHECK
 // ======================================
 
-onAuthStateChanged(auth, async (user) => {
+onAuthStateChanged(
+    auth,
+    async (user) => {
 
-    console.log("Auth state changed:", user);
+        console.log(
+            "Auth state changed:",
+            user
+        );
 
 
-    if (!user) {
+        // ==================================
+        // NOT LOGGED IN
+        // ==================================
 
-        console.log("No user logged in.");
+        if (!user) {
 
-        const tbody =
-            document.getElementById("ordersBody");
+            console.log(
+                "No user logged in."
+            );
 
-        if (tbody) {
+            const tbody =
+                document.getElementById(
+                    "ordersBody"
+                );
 
-            tbody.innerHTML = `
-                <tr>
-                    <td colspan="13"
-                        style="
-                            color:red;
-                            text-align:center;
-                            padding:25px;
-                        "
-                    >
-                        ❌ Admin login required.
-                    </td>
-                </tr>
-            `;
+            if (tbody) {
 
+                tbody.innerHTML = `
+                    <tr>
+                        <td
+                            colspan="13"
+                            style="
+                                color:red;
+                                text-align:center;
+                                padding:25px;
+                            "
+                        >
+                            ❌ Admin login required.
+                        </td>
+                    </tr>
+                `;
+
+            }
+
+            return;
         }
 
-        return;
-    }
 
+        // ==================================
+        // USER UID
+        // ==================================
 
-    console.log("Logged in UID:", user.uid);
-
-
-    // ==================================
-    // CHECK ADMIN UID
-    // ==================================
-
-    if (user.uid !== ADMIN_UID) {
-
-        console.error(
-            "Wrong admin account.",
+        console.log(
+            "Logged in UID:",
             user.uid
         );
 
-        const tbody =
-            document.getElementById("ordersBody");
 
-        if (tbody) {
+        // ==================================
+        // ADMIN CHECK
+        // ==================================
 
-            tbody.innerHTML = `
-                <tr>
-                    <td colspan="13"
-                        style="
-                            color:red;
-                            text-align:center;
-                            padding:25px;
-                        "
-                    >
-                        ❌ This account is not the admin account.
-                    </td>
-                </tr>
-            `;
+        if (user.uid !== ADMIN_UID) {
 
+            console.error(
+                "Wrong admin account:",
+                user.uid
+            );
+
+
+            const tbody =
+                document.getElementById(
+                    "ordersBody"
+                );
+
+
+            if (tbody) {
+
+                tbody.innerHTML = `
+                    <tr>
+                        <td
+                            colspan="13"
+                            style="
+                                color:red;
+                                text-align:center;
+                                padding:25px;
+                            "
+                        >
+
+                            ❌ This account is
+                            not the admin account.
+
+                            <br><br>
+
+                            UID:
+                            ${escapeHTML(user.uid)}
+
+                        </td>
+                    </tr>
+                `;
+
+            }
+
+            return;
         }
 
-        return;
+
+        console.log(
+            "✅ Admin UID verified"
+        );
+
+
+        // ==================================
+        // LOAD ORDERS
+        // ==================================
+
+        await loadOrders();
+
     }
-
-
-    console.log("✅ Admin UID verified");
-
-
-    // ==================================
-    // LOAD ORDERS
-    // ==================================
-
-    await loadOrders();
-
-});
+);
 
 
 // ======================================
 // LOGOUT
 // ======================================
 
-window.logoutAdmin = async function () {
+window.logoutAdmin =
+async function () {
 
     try {
 
         await signOut(auth);
 
-        alert("Logged out successfully.");
+        console.log(
+            "Admin logged out"
+        );
 
-        window.location.href = "login.html";
+        window.location.href =
+            "login.html";
 
     } catch (error) {
 
@@ -376,7 +501,7 @@ window.logoutAdmin = async function () {
         );
 
         alert(
-            "Logout failed: " +
+            "Logout failed:\n\n" +
             error.message
         );
 
@@ -391,15 +516,41 @@ window.logoutAdmin = async function () {
 
 function escapeHTML(value) {
 
-    if (value === null || value === undefined) {
+    if (
+        value === null ||
+        value === undefined
+    ) {
+
         return "";
+
     }
 
+
     return String(value)
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
+
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+
+        .replace(
+            /</g,
+            "&lt;"
+        )
+
+        .replace(
+            />/g,
+            "&gt;"
+        )
+
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+
+        .replace(
+            /'/g,
+            "&#039;"
+        );
 
 }
