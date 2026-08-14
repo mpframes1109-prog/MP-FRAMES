@@ -88,48 +88,39 @@ async function loadOrders() {
             }
 
 
-            // Photo
-            let photoHTML = `
-                <span class="no-photo">
-                    No Photo
-                </span>
-            `;
+            // PHOTO
+let photoHTML = "No Photo";
 
+if (order.photo && order.photo !== "") {
 
-            if (order.photo) {
+    photoHTML = `
+        <img
+            src="${order.photo}"
+            width="90"
+            height="90"
+            style="width:90px;height:90px;object-fit:cover;border-radius:8px;display:block;margin:auto;"
+            onerror="this.style.display='none'; this.nextElementSibling.style.display='block';"
+        >
 
-                photoHTML = `
+        <div style="display:none;color:red;font-size:12px;">
+            Image Error
+        </div>
 
-                    <img
-                        src="${order.photo}"
-                        class="order-photo"
-                        alt="Customer Photo"
-                    >
+        <div style="margin-top:8px;display:flex;flex-direction:column;gap:5px;">
 
-                    <div class="photo-buttons">
+            <a href="${order.photo}" target="_blank"
+               style="background:#2196F3;color:white;padding:6px;border-radius:5px;text-decoration:none;">
+               🔍 View
+            </a>
 
-                        <a
-                            href="${order.photo}"
-                            target="_blank"
-                            class="view-btn"
-                        >
-                            🔍 View
-                        </a>
+            <a href="${order.photo}" target="_blank" download
+               style="background:#673AB7;color:white;padding:6px;border-radius:5px;text-decoration:none;">
+               ⬇ Download
+            </a>
 
-                        <a
-                            href="${order.photo}"
-                            download
-                            class="download-btn"
-                        >
-                            ⬇ Download
-                        </a>
-
-                    </div>
-
-                `;
-
-            }
-
+        </div>
+    `;
+}
 
             // Payment display
             let paymentHTML = "";
