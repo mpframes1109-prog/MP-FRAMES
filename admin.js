@@ -55,6 +55,12 @@ async function addProduct(){
 
     alert("Product Added");
 
+  
+}
+window.deleteProduct = async function(id){
+
+    await deleteDoc(doc(db,"products",id));
+
     loadProducts();
 
 }
