@@ -1,121 +1,503 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MP Frames - Products</title>
 
-<link rel="stylesheet" href="style.css">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>MP Frames - Products</title>
+
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    >
+
+    <style>
+
+        /* ==============================
+           PRODUCTS PAGE
+        ============================== */
+
+        #products {
+
+            max-width: 1200px;
+
+            margin: 40px auto;
+
+            padding: 0 20px;
+
+        }
+
+
+        #products h2 {
+
+            text-align: center;
+
+            margin-bottom: 25px;
+
+        }
+
+
+        /* ==============================
+           SEARCH + FILTER
+        ============================== */
+
+        .product-controls {
+
+            display: flex;
+
+            gap: 12px;
+
+            justify-content: center;
+
+            align-items: center;
+
+            margin-bottom: 30px;
+
+            flex-wrap: wrap;
+
+        }
+
+
+        .product-controls input {
+
+            width: 280px;
+
+            padding: 12px 15px;
+
+            border: 1px solid #ccc;
+
+            border-radius: 8px;
+
+            font-size: 15px;
+
+            outline: none;
+
+        }
+
+
+        .product-controls select {
+
+            width: 200px;
+
+            padding: 12px 15px;
+
+            border: 1px solid #ccc;
+
+            border-radius: 8px;
+
+            font-size: 15px;
+
+            background: white;
+
+            outline: none;
+
+        }
+
+
+        .product-controls input:focus,
+        .product-controls select:focus {
+
+            border-color: #111;
+
+        }
+
+
+        /* ==============================
+           PRODUCT GRID
+        ============================== */
+
+        .product-container {
+
+            display: grid;
+
+            grid-template-columns:
+                repeat(
+                    auto-fit,
+                    minmax(220px, 1fr)
+                );
+
+            gap: 25px;
+
+        }
+
+
+        /* ==============================
+           PRODUCT CARD
+        ============================== */
+
+        .product-card {
+
+            background: #fff;
+
+            border-radius: 12px;
+
+            overflow: hidden;
+
+            box-shadow:
+                0 4px 15px
+                rgba(0,0,0,0.10);
+
+            transition:
+                transform 0.2s ease,
+                box-shadow 0.2s ease;
+
+        }
+
+
+        .product-card:hover {
+
+            transform:
+                translateY(-5px);
+
+            box-shadow:
+                0 8px 25px
+                rgba(0,0,0,0.16);
+
+        }
+
+
+        .product-card img {
+
+            width: 100%;
+
+            height: 250px;
+
+            object-fit: cover;
+
+            display: block;
+
+            background: #f5f5f5;
+
+        }
+
+
+        .product-info {
+
+            padding: 18px;
+
+        }
+
+
+        .product-info h3 {
+
+            margin:
+                0 0 8px;
+
+            font-size: 19px;
+
+        }
+
+
+        .product-info p {
+
+            margin:
+                0 0 10px;
+
+            color: #777;
+
+            font-size: 14px;
+
+        }
+
+
+        .product-info h4 {
+
+            margin:
+                0 0 15px;
+
+            font-size: 20px;
+
+        }
+
+
+        /* ==============================
+           BUTTONS
+        ============================== */
+
+        .product-info button {
+
+            width: 100%;
+
+            padding: 11px;
+
+            border: none;
+
+            border-radius: 7px;
+
+            margin-top: 8px;
+
+            cursor: pointer;
+
+            font-size: 14px;
+
+        }
+
+
+        .product-info button:first-of-type {
+
+            background: #111;
+
+            color: white;
+
+        }
+
+
+        .product-info button:last-of-type {
+
+            background: #25D366;
+
+            color: white;
+
+        }
+
+
+        .product-info button:hover {
+
+            opacity: 0.88;
+
+        }
+
+
+        /* ==============================
+           LOADING
+        ============================== */
+
+        .loading {
+
+            text-align: center;
+
+            padding: 40px;
+
+            font-size: 18px;
+
+            color: #777;
+
+        }
+
+
+        /* ==============================
+           MOBILE
+        ============================== */
+
+        @media (max-width: 600px) {
+
+            #products {
+
+                margin-top: 25px;
+
+                padding:
+                    0 12px;
+
+            }
+
+
+            .product-controls {
+
+                flex-direction: column;
+
+            }
+
+
+            .product-controls input,
+            .product-controls select {
+
+                width: 100%;
+
+                box-sizing: border-box;
+
+            }
+
+
+            .product-container {
+
+                grid-template-columns:
+                    repeat(2, 1fr);
+
+                gap: 12px;
+
+            }
+
+
+            .product-card img {
+
+                height: 180px;
+
+            }
+
+
+            .product-info {
+
+                padding: 12px;
+
+            }
+
+
+            .product-info h3 {
+
+                font-size: 16px;
+
+            }
+
+
+            .product-info h4 {
+
+                font-size: 17px;
+
+            }
+
+        }
+
+    </style>
 
 </head>
+
+
 <body>
+
+
+<!-- ==============================
+     HEADER
+============================== -->
 
 <header>
 
-<div class="logo">
-<h2>MP Frames</h2>
-</div>
+    <div class="logo">
 
-<nav>
-<a href="index.html">Home</a>
-<a href="products.html">Products</a>
-<a href="about.html">About</a>
-<a href="contact.html">Contact</a>
-<a href="cart.html">
-<i class="fa-solid fa-cart-shopping"></i>
-<span id="cart-count">0</span>
-</a>
-</nav>
+        <h2>MP Frames</h2>
+
+    </div>
+
+
+    <nav>
+
+        <a href="index.html">
+            Home
+        </a>
+
+        <a href="products.html">
+            Products
+        </a>
+
+        <a href="about.html">
+            About
+        </a>
+
+        <a href="contact.html">
+            Contact
+        </a>
+
+
+        <a href="cart.html">
+
+            <i
+                class="fa-solid fa-cart-shopping"
+            ></i>
+
+            <span id="cart-count">
+                0
+            </span>
+
+        </a>
+
+    </nav>
 
 </header>
 
+
+
+<!-- ==============================
+     PRODUCTS
+============================== -->
+
 <section id="products">
 
-<h2>Our Photo Frames</h2>
 
-<div class="product-container" id="product-container">
+    <h2>
+        Our Photo Frames
+    </h2>
 
-</div>
+
+    <!-- SEARCH + CATEGORY -->
+
+    <div class="product-controls">
+
+
+        <input
+            type="text"
+            id="search"
+            placeholder="Search frames..."
+        >
+
+
+        <select
+            id="categoryFilter"
+        >
+
+            <option value="">
+                All Categories
+            </option>
+
+        </select>
+
+
+    </div>
+
+
+
+    <!-- PRODUCT CONTAINER -->
+
+    <div
+        class="product-container"
+        id="product-container"
+    >
+
+        <div class="loading">
+            Loading products...
+        </div>
+
+    </div>
+
 
 </section>
 
+
+
+<!-- ==============================
+     FOOTER
+============================== -->
+
 <footer>
 
-<p>© 2026 MP Frames. All Rights Reserved.</p>
+    <p>
+        © 2026 MP Frames.
+        All Rights Reserved.
+    </p>
 
 </footer>
 
 
-<script type="module">
-import { db } from "./firebase.js";
 
-import {
-  collection,
-  getDocs
-} from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+<!-- ==============================
+     PRODUCTS JS
+============================== -->
 
-const container = document.getElementById("product-container");
+<script
+    type="module"
+    src="products.js"
+></script>
 
-async function loadProducts() {
-
-    container.innerHTML = "";
-
-    const snapshot = await getDocs(collection(db, "products"));
-
-    snapshot.forEach((doc) => {
-
-        const product = doc.data();
-
-        container.innerHTML += `
-        <div class="product">
-
-            <img src="${product.image}" alt="${product.name}">
-
-            <div class="product-content">
-
-                <h3>${product.name}</h3>
-
-                <p class="price">₹${product.price}</p>
-
-                <button onclick="addToCart(
-                    '${doc.id}',
-                    '${product.name}',
-                    ${product.price},
-                    '${product.image}'
-                )">
-                    Add To Cart
-                </button>
-
-            </div>
-
-        </div>
-        `;
-    });
-
-}
-
-window.addToCart = function(id, name, price, image){
-
-    let cart = JSON.parse(localStorage.getItem("cart")) || [];
-
-    cart.push({
-        id,
-        name,
-        price,
-        image,
-        quantity:1
-    });
-
-    localStorage.setItem("cart", JSON.stringify(cart));
-
-    alert("Product Added To Cart");
-
-}
-
-loadProducts();
-
-</script>
 
 </body>
+
 </html>
