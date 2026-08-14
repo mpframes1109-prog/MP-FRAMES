@@ -1,26 +1,49 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
+import {
+    initializeApp
+} from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
 
-import { getFirestore } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+import {
+    getFirestore
+} from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
 import {
     getAuth
 } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
-const auth = getAuth(app);
+
 
 const firebaseConfig = {
-    apiKey: "AIzaSyDhnMP9qnXdhXAsIP6UIeOjuMz-5OVwdwE",
+
+   apiKey: "AIzaSyDhnMP9qnXdhXAsIP6UIeOjuMz-5OVwdwE",
+
     authDomain: "mp-frames.firebaseapp.com",
+
     projectId: "mp-frames",
+
     storageBucket: "mp-frames.firebasestorage.app",
+
     messagingSenderId: "1062760470249",
+
     appId: "1:1062760470249:web:37604cd27f43438aff0278",
+
     measurementId: "G-6GZ6PEEH3L"
 };
 
 
-const app = initializeApp(firebaseConfig);
+const app =
+    initializeApp(firebaseConfig);
 
-const db = getFirestore(app);
 
 
-export { app, db, auth };
+const db =
+    getFirestore(app);
+
+
+const auth =
+    getAuth(app);
+
+
+export {
+    app,
+    db,
+    auth
+};
