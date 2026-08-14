@@ -26,7 +26,7 @@ async function loadOrders() {
 
             table.innerHTML = `
                 <tr>
-                    <td colspan="11">
+                    <td colspan="13" class="empty">
                         No Orders Found
                     </td>
                 </tr>
@@ -43,90 +43,19 @@ async function loadOrders() {
             const id = document.id;
 
 
-            // Payment status
+            // -----------------------------
+            // PAYMENT STATUS
+            // -----------------------------
+
             const paymentStatus =
                 order.paymentStatus ||
-                order.status ||
                 "Not Paid";
 
 
-            // Order status
-            const orderStatus =
-                order.orderStatus ||
-                "Pending";
-
-
-            // Date
-            let orderDate = "";
-
-            if (order.createdAt) {
-
-                try {
-
-                    if (order.createdAt.toDate) {
-
-                        orderDate =
-                            order.createdAt
-                                .toDate()
-                                .toLocaleString();
-
-                    } else {
-
-                        orderDate =
-                            new Date(
-                                order.createdAt
-                            ).toLocaleString();
-
-                    }
-
-                } catch (e) {
-
-                    orderDate = "";
-
-                }
-
-            }
-
-
-            // PHOTO
-let photoHTML = "No Photo";
-
-if (order.photo && order.photo !== "") {
-
-    photoHTML = `
-        <img
-            src="${order.photo}"
-            width="90"
-            height="90"
-            style="width:90px;height:90px;object-fit:cover;border-radius:8px;display:block;margin:auto;"
-            onerror="this.style.display='none'; this.nextElementSibling.style.display='block';"
-        >
-
-        <div style="display:none;color:red;font-size:12px;">
-            Image Error
-        </div>
-
-        <div style="margin-top:8px;display:flex;flex-direction:column;gap:5px;">
-
-            <a href="${order.photo}" target="_blank"
-               style="background:#2196F3;color:white;padding:6px;border-radius:5px;text-decoration:none;">
-               🔍 View
-            </a>
-
-            <a href="${order.photo}" target="_blank" download
-               style="background:#673AB7;color:white;padding:6px;border-radius:5px;text-decoration:none;">
-               ⬇ Download
-            </a>
-
-        </div>
-    `;
-}
-
-            // Payment display
             let paymentHTML = "";
 
             if (
-                paymentStatus.toLowerCase() === "paid"
+                String(paymentStatus).toLowerCase() === "paid"
             ) {
 
                 paymentHTML = `
@@ -146,49 +75,230 @@ if (order.photo && order.photo !== "") {
             }
 
 
+            // -----------------------------
+            // ORDER STATUS
+            // -----------------------------
+
+            const orderStatus =
+                order.orderStatus ||
+                order.status ||
+                "Pending";
+
+
+            // -----------------------------
+            // DATE
+            // -----------------------------
+
+            let orderDate = "";
+
+            if (order.createdAt) {
+
+                try {
+
+                    if (
+                        typeof order.createdAt.toDate ===
+                        "function"
+                    ) {
+
+                        orderDate =
+                            order.createdAt
+                                .toDate()
+                                .toLocaleString();
+
+                    } else {
+
+                        orderDate =
+                            new Date(
+                                order.createdAt
+                            ).toLocaleString();
+
+                    }
+
+                } catch (error) {
+
+                    orderDate = "";
+
+                }
+
+            }
+
+
+            // -----------------------------
+            // FRAME IMAGE
+            // -----------------------------
+
+            const frameImage =
+                order.image ||
+                order.productImage ||
+                order.frameImage ||
+                "";
+
+
+            let frameImageHTML =
+                `<span class="no-photo">No Frame Image</span>`;
+
+
+            if (frameImage) {
+
+                frameImageHTML = `
+                    <img
+                        src="${frameImage}"
+                        class="frame-image"
+                        alt="Frame Image"
+                    >
+
+                    <div class="photo-buttons">
+
+                        <a
+                            href="${frameImage}"
+                            target="_blank"
+                            class="view-btn"
+                        >
+                            🔍 View
+                        </a>
+
+                        <a
+                            href="${frameImage}"
+                            target="_blank"
+                            download
+                            class="download-btn"
+                        >
+                            ⬇ Download
+                        </a>
+
+                    </div>
+                `;
+
+            }
+
+
+            // -----------------------------
+            // CUSTOMER UPLOADED PHOTO
+            // -----------------------------
+
+            const customerPhoto =
+                order.photo ||
+                order.photoURL ||
+                "";
+
+
+            let customerPhotoHTML =
+                `<span class="no-photo">No Photo</span>`;
+
+
+            if (customerPhoto) {
+
+                customerPhotoHTML = `
+                    <img
+                        src="${customerPhoto}"
+                        class="customer-image"
+                        alt="Customer Photo"
+                    >
+
+                    <div class="photo-buttons">
+
+                        <a
+                            href="${customerPhoto}"
+                            target="_blank"
+                            class="view-btn"
+                        >
+                            🔍 View
+                        </a>
+
+                        <a
+                            href="${customerPhoto}"
+                            target="_blank"
+                            download
+                            class="download-btn"
+                        >
+                            ⬇ Download
+                        </a>
+
+                    </div>
+                `;
+
+            }
+
+
+            // -----------------------------
+            // ADD ROW
+            // -----------------------------
+
             table.innerHTML += `
 
                 <tr>
+
+                    <!-- NAME -->
 
                     <td>
                         ${order.customerName || ""}
                     </td>
 
 
+                    <!-- PHONE -->
+
                     <td>
                         ${order.phone || ""}
                     </td>
 
+
+                    <!-- ADDRESS -->
 
                     <td>
                         ${order.address || ""}
                     </td>
 
 
+                    <!-- FRAME NAME -->
+
                     <td>
                         ${order.frameName || ""}
                     </td>
 
+
+                    <!-- FRAME IMAGE -->
+
+                    <td>
+                        ${frameImageHTML}
+                    </td>
+
+
+                    <!-- QUANTITY -->
 
                     <td>
                         ${order.quantity || 1}
                     </td>
 
 
+                    <!-- PRICE -->
+
                     <td>
-                        ₹${order.price || 0}
+                        ₹${Number(order.price || 0)}
                     </td>
 
 
+                    <!-- CUSTOMER PHOTO -->
+
                     <td>
-                        ${photoHTML}
+                        ${customerPhotoHTML}
                     </td>
 
+
+                    <!-- MESSAGE -->
+
+                    <td>
+                        ${order.message || ""}
+                    </td>
+
+
+                    <!-- PAYMENT -->
 
                     <td>
                         ${paymentHTML}
                     </td>
 
+
+                    <!-- STATUS -->
 
                     <td>
 
@@ -198,27 +308,35 @@ if (order.photo && order.photo !== "") {
 
                             <option
                                 value="Pending"
-                                ${orderStatus === "Pending"
-                                    ? "selected"
-                                    : ""}
+                                ${
+                                    orderStatus === "Pending"
+                                        ? "selected"
+                                        : ""
+                                }
                             >
                                 Pending
                             </option>
 
+
                             <option
                                 value="Confirmed"
-                                ${orderStatus === "Confirmed"
-                                    ? "selected"
-                                    : ""}
+                                ${
+                                    orderStatus === "Confirmed"
+                                        ? "selected"
+                                        : ""
+                                }
                             >
                                 Confirmed
                             </option>
 
+
                             <option
                                 value="Delivered"
-                                ${orderStatus === "Delivered"
-                                    ? "selected"
-                                    : ""}
+                                ${
+                                    orderStatus === "Delivered"
+                                        ? "selected"
+                                        : ""
+                                }
                             >
                                 Delivered
                             </option>
@@ -227,6 +345,8 @@ if (order.photo && order.photo !== "") {
 
                     </td>
 
+
+                    <!-- UPDATE -->
 
                     <td>
 
@@ -239,6 +359,8 @@ if (order.photo && order.photo !== "") {
 
                     </td>
 
+
+                    <!-- DATE -->
 
                     <td>
                         ${orderDate}
@@ -263,7 +385,10 @@ if (order.photo && order.photo !== "") {
 
             <tr>
 
-                <td colspan="11">
+                <td
+                    colspan="13"
+                    class="empty"
+                >
 
                     ❌ Error loading orders
 
@@ -283,7 +408,11 @@ if (order.photo && order.photo !== "") {
 
 
 
-window.updateStatus = async function(id) {
+// ------------------------------------
+// UPDATE ORDER STATUS
+// ------------------------------------
+
+window.updateStatus = async function (id) {
 
     try {
 
@@ -293,15 +422,32 @@ window.updateStatus = async function(id) {
             );
 
 
+        if (!select) {
+
+            alert("Status selector not found");
+
+            return;
+
+        }
+
+
         const newStatus =
             select.value;
 
 
         await updateDoc(
-            doc(db, "orders", id),
+
+            doc(
+                db,
+                "orders",
+                id
+            ),
+
             {
-                orderStatus: newStatus
+                orderStatus: newStatus,
+                status: newStatus
             }
+
         );
 
 
@@ -310,7 +456,7 @@ window.updateStatus = async function(id) {
         );
 
 
-        loadOrders();
+        await loadOrders();
 
 
     } catch (error) {
@@ -330,5 +476,10 @@ window.updateStatus = async function(id) {
 
 };
 
+
+
+// ------------------------------------
+// LOAD ORDERS
+// ------------------------------------
 
 loadOrders();
