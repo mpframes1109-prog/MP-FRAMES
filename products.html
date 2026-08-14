@@ -492,10 +492,266 @@
      PRODUCTS JS
 ============================== -->
 
-<script
-    type="module"
-    src="products.js"
-></script>
+<script><script type="module">
+
+import { db } from "./firebase.js";
+
+import {
+    collection,
+    getDocs
+} from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+
+
+const container =
+    document.getElementById("product-container");
+
+
+async function loadProducts() {
+
+    try {
+
+        container.innerHTML =
+            "<p style='text-align:center;'>Loading products...</p>";
+
+
+        const snapshot =
+            await getDocs(
+                collection(db, "products")
+            );
+
+
+        console.log(
+            "Products found:",
+            snapshot.size
+        );
+
+
+        if (snapshot.empty) {
+
+            container.innerHTML =
+                "<p style='text-align:center;'>No products found.</p>";
+
+            return;
+        }
+
+
+        container.innerHTML = "";
+
+
+        snapshot.forEach((docSnap) => {
+
+            const product =
+                docSnap.data();
+
+
+            console.log(
+                "Product:",
+                product
+            );
+
+
+            const card =
+                document.createElement("div");
+
+            card.className =
+                "product";
+
+
+            card.innerHTML = `
+
+                <img
+                    src="${product.image || ""}"
+                    alt="${product.name || "Product"}"
+                    onerror="this.src='https://via.placeholder.com/300x300?text=Image+Error'"
+                >
+
+                <div class="product-content">
+
+                    <h3>
+                        ${product.name || "Unnamed Product"}
+                    </h3>
+
+                    <p class="price">
+                        ₹${Number(product.price) || 0}
+                    </p>
+
+                    <button
+                        class="view-product"
+                    >
+                        View Product
+                    </button>
+
+                    <button
+                        class="add-cart"
+                    >
+                        Add To Cart
+                    </button>
+
+                </div>
+
+            `;
+
+
+            /* VIEW PRODUCT */
+
+            card
+                .querySelector(".view-product")
+                .addEventListener(
+                    "click",
+                    () => {
+
+                        localStorage.setItem(
+                            "selectedProduct",
+                            JSON.stringify({
+
+                                id: docSnap.id,
+
+                                name:
+                                    product.name || "",
+
+                                price:
+                                    Number(product.price) || 0,
+
+                                image:
+                                    product.image || "",
+
+                                category:
+                                    product.category || ""
+
+                            })
+                        );
+
+
+                        window.location.href =
+                            "product.html";
+
+                    }
+                );
+
+
+            /* ADD TO CART */
+
+            card
+                .querySelector(".add-cart")
+                .addEventListener(
+                    "click",
+                    () => {
+
+                        let cart =
+                            JSON.parse(
+                                localStorage.getItem(
+                                    "cart"
+                                )
+                            ) || [];
+
+
+                        const existing =
+                            cart.find(
+                                item =>
+                                    item.id ===
+                                    docSnap.id
+                            );
+
+
+                        if (existing) {
+
+                            existing.quantity =
+                                (
+                                    Number(
+                                        existing.quantity
+                                    ) || 1
+                                ) + 1;
+
+                        } else {
+
+                            cart.push({
+
+                                id:
+                                    docSnap.id,
+
+                                name:
+                                    product.name || "",
+
+                                price:
+                                    Number(
+                                        product.price
+                                    ) || 0,
+
+                                image:
+                                    product.image || "",
+
+                                category:
+                                    product.category || "",
+
+                                quantity: 1
+
+                            });
+
+                        }
+
+
+                        localStorage.setItem(
+                            "cart",
+                            JSON.stringify(cart)
+                        );
+
+
+                        alert(
+                            "Product Added To Cart"
+                        );
+
+                    }
+                );
+
+
+            container.appendChild(card);
+
+        });
+
+
+    } catch (error) {
+
+        console.error(
+            "PRODUCT LOAD ERROR:",
+            error
+        );
+
+
+        container.innerHTML = `
+
+            <div
+                style="
+                    text-align:center;
+                    padding:30px;
+                    color:red;
+                "
+            >
+
+                <h3>
+                    Products could not be loaded
+                </h3>
+
+                <p>
+                    ${error.code || ""}
+                </p>
+
+                <p>
+                    ${error.message || ""}
+                </p>
+
+            </div>
+
+        `;
+
+    }
+
+}
+
+
+loadProducts();
+
+</script>
+    
 
 
 </body>
