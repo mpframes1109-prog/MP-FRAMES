@@ -4,40 +4,47 @@ import {
     collection,
     getDocs,
     doc,
-    updateDoc,
-    query,
-    orderBy
+    updateDoc
 } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
 
 const table = document.getElementById("ordersTable");
 
 
+// ===============================
+// LOAD ORDERS
+// ===============================
+
 async function loadOrders() {
+
+    if (!table) return;
 
     table.innerHTML = `
         <tr>
-            <td colspan="9">Loading orders...</td>
+            <td colspan="11">
+                Loading orders...
+            </td>
         </tr>
     `;
 
 
     try {
 
-        const ordersQuery = query(
-            collection(db, "orders"),
-            orderBy("createdAt", "desc")
-        );
+        const snapshot =
+            await getDocs(
+                collection(db, "orders")
+            );
 
-        const snapshot = await getDocs(ordersQuery);
+
+        table.innerHTML = "";
 
 
         if (snapshot.empty) {
 
             table.innerHTML = `
                 <tr>
-                    <td colspan="9">
-                        No customer orders found
+                    <td colspan="11">
+                        No orders found
                     </td>
                 </tr>
             `;
@@ -46,110 +53,282 @@ async function loadOrders() {
         }
 
 
-        table.innerHTML = "";
-
-
         snapshot.forEach((document) => {
 
             const order = document.data();
 
-            const photo = order.photo
-                ? `
+            const id = document.id;
+
+
+            // ===============================
+            // PHOTO
+            // ===============================
+
+            let photoHTML = "No Photo";
+
+
+            if (order.photo) {
+
+                photoHTML = `
+
                     <img
                         src="${order.photo}"
-                        class="order-image"
-                        alt="Customer Photo"
+                        width="90"
+                        height="90"
+                        style="
+                            object-fit:cover;
+                            border-radius:8px;
+                            display:block;
+                            margin:auto;
+                        "
                     >
-                  `
-                : "No Photo";
+
+                    <div style="
+                        margin-top:8px;
+                        display:flex;
+                        gap:5px;
+                        justify-content:center;
+                        flex-direction:column;
+                    ">
+
+                        <a
+                            href="${order.photo}"
+                            target="_blank"
+                            style="
+                                background:#25D366;
+                                color:white;
+                                padding:8px;
+                                text-decoration:none;
+                                border-radius:5px;
+                            "
+                        >
+                            🔍 View
+                        </a>
 
 
-            const viewButton = order.photo
-                ? `
-                    <button
-                        class="view-btn"
-                        onclick="viewImage('${order.photo}')">
-                        👁️ View
-                    </button>
-                  `
-                : "";
+                        <a
+                            href="${order.photo}"
+                            target="_blank"
+                            download
+                            style="
+                                background:#2196F3;
+                                color:white;
+                                padding:8px;
+                                text-decoration:none;
+                                border-radius:5px;
+                            "
+                        >
+                            ⬇️ Download
+                        </a>
+
+                    </div>
+
+                `;
+
+            }
 
 
-            const downloadButton = order.photo
-                ? `
-                    <a
-                        class="download-btn"
-                        href="${order.photo}"
-                        target="_blank"
-                        download>
-                        ⬇️ Download
-                    </a>
-                  `
-                : "";
+            // ===============================
+            // PAYMENT STATUS
+            // ===============================
 
+            const paymentStatus =
+                order.paymentStatus || "Not Paid";
+
+
+            let paymentColor = "#dc3545";
+
+
+            if (
+                paymentStatus === "Paid"
+            ) {
+
+                paymentColor = "#198754";
+
+            }
+
+
+            // ===============================
+            // CREATED DATE
+            // ===============================
+
+            let createdDate = "";
+
+
+            if (order.createdAt) {
+
+                try {
+
+                    if (
+                        typeof order.createdAt.toDate ===
+                        "function"
+                    ) {
+
+                        createdDate =
+                            order.createdAt
+                                .toDate()
+                                .toLocaleString();
+
+                    }
+                    else {
+
+                        createdDate =
+                            new Date(
+                                order.createdAt
+                            ).toLocaleString();
+
+                    }
+
+                }
+                catch {
+
+                    createdDate = "";
+
+                }
+
+            }
+
+
+            // ===============================
+            // TABLE ROW
+            // ===============================
 
             table.innerHTML += `
 
                 <tr>
 
+                    <!-- NAME -->
+
                     <td>
-                        <strong>
-                            ${order.customerName || ""}
-                        </strong>
+                        ${order.customerName || ""}
                     </td>
 
+
+                    <!-- PHONE -->
 
                     <td>
                         ${order.phone || ""}
                     </td>
 
 
+                    <!-- ADDRESS -->
+
                     <td>
                         ${order.address || ""}
                     </td>
 
 
+                    <!-- FRAME -->
+
                     <td>
                         ${order.frameName || ""}
-                        <br>
-                        <small>
-                            Qty: ${order.quantity || 1}
-                        </small>
                     </td>
 
+
+                    <!-- QUANTITY -->
+
+                    <td>
+                        ${order.quantity || 1}
+                    </td>
+
+
+                    <!-- PRICE -->
 
                     <td>
                         ₹${order.price || 0}
                     </td>
 
 
+                    <!-- PHOTO -->
+
                     <td>
-                        ${photo}
+                        ${photoHTML}
                     </td>
 
+
+                    <!-- PAYMENT -->
+
+                    <td>
+
+                        <b style="
+                            color:${paymentColor};
+                        ">
+                            ${paymentStatus}
+                        </b>
+
+                        ${
+                            order.paymentId
+                            ? `
+                                <br>
+
+                                <small>
+                                    ID:
+                                    ${order.paymentId}
+                                </small>
+                              `
+                            : ""
+                        }
+
+                    </td>
+
+
+                    <!-- ORDER STATUS -->
 
                     <td>
 
                         <select
-                            id="status-${document.id}"
-                            class="status-select">
+                            id="status-${id}"
+                        >
 
                             <option
                                 value="Pending"
-                                ${order.status === "Pending" ? "selected" : ""}>
+                                ${
+                                    order.status ===
+                                    "Pending"
+                                    ? "selected"
+                                    : ""
+                                }
+                            >
                                 Pending
                             </option>
 
+
                             <option
                                 value="Confirmed"
-                                ${order.status === "Confirmed" ? "selected" : ""}>
+                                ${
+                                    order.status ===
+                                    "Confirmed"
+                                    ? "selected"
+                                    : ""
+                                }
+                            >
                                 Confirmed
                             </option>
 
+
                             <option
                                 value="Delivered"
-                                ${order.status === "Delivered" ? "selected" : ""}>
+                                ${
+                                    order.status ===
+                                    "Delivered"
+                                    ? "selected"
+                                    : ""
+                                }
+                            >
                                 Delivered
+                            </option>
+
+
+                            <option
+                                value="Cancelled"
+                                ${
+                                    order.status ===
+                                    "Cancelled"
+                                    ? "selected"
+                                    : ""
+                                }
+                            >
+                                Cancelled
                             </option>
 
                         </select>
@@ -157,18 +336,25 @@ async function loadOrders() {
                     </td>
 
 
-                    <td class="actions">
+                    <!-- UPDATE -->
 
-                        ${viewButton}
-
-                        ${downloadButton}
+                    <td>
 
                         <button
-                            class="update-btn"
-                            onclick="updateStatus('${document.id}')">
-                            ✅ Update
+                            onclick="
+                                updateStatus('${id}')
+                            "
+                        >
+                            Update
                         </button>
 
+                    </td>
+
+
+                    <!-- DATE -->
+
+                    <td>
+                        ${createdDate}
                     </td>
 
                 </tr>
@@ -177,69 +363,102 @@ async function loadOrders() {
 
         });
 
+    }
+    catch (error) {
 
-    } catch (error) {
+        console.error(
+            "Load orders error:",
+            error
+        );
 
-        console.error("Load orders error:", error);
 
         table.innerHTML = `
+
             <tr>
-                <td colspan="9">
+
+                <td colspan="11">
+
                     ❌ Failed to load orders
-                    <br>
+
+                    <br><br>
+
                     ${error.message}
+
                 </td>
+
             </tr>
+
         `;
+
     }
 
 }
 
 
 
-/* VIEW IMAGE */
+// ===============================
+// UPDATE STATUS
+// ===============================
 
-window.viewImage = function(url) {
-
-    window.open(url, "_blank");
-
-};
-
-
-
-/* UPDATE STATUS */
 window.updateStatus = async function(id) {
 
     try {
 
-        const select = document.getElementById(`status-${id}`);
-        const button = event.target;
+        const select =
+            document.getElementById(
+                `status-${id}`
+            );
+
+
+        if (!select) {
+
+            alert("Status selector not found");
+
+            return;
+
+        }
+
 
         const status = select.value;
 
-        button.disabled = true;
-        button.innerText = "Updating...";
 
-        await updateDoc(doc(db, "orders", id), {
-            status: status
-        });
+        await updateDoc(
+            doc(db, "orders", id),
+            {
+                status: status
+            }
+        );
 
-        button.disabled = false;
-        button.innerText = "Updated";
 
-        setTimeout(() => {
-            button.innerText = "Update";
-        }, 1500);
+        alert(
+            "Order status updated successfully"
+        );
 
-    } catch (error) {
 
-        console.error("Status update error:", error);
+        loadOrders();
 
-        alert("Update failed: " + error.message);
+    }
+    catch (error) {
 
-        event.target.disabled = false;
-        event.target.innerText = "Update";
+        console.error(
+            "Update status error:",
+            error
+        );
+
+
+        alert(
+            "Update failed:\n" +
+            error.message
+        );
+
     }
 
 };
 
+
+
+// ===============================
+// START
+// ===============================
+
+loadOrders();
