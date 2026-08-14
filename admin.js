@@ -39,4 +39,22 @@ async function loadProducts() {
 
 }
 
-loadProducts();
+async function addProduct(){
+
+    const name = document.getElementById("name").value;
+    const price = document.getElementById("price").value;
+    const image = document.getElementById("image").value;
+
+    await addDoc(collection(db,"products"),{
+
+        name:name,
+        price:Number(price),
+        image:image
+
+    });
+
+    alert("Product Added");
+
+    loadProducts();
+
+}
