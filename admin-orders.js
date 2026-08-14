@@ -1,33 +1,62 @@
-import { db } from "./firebase.js";
+import { db, auth } from "./firebase.js";
 
 import {
     collection,
     getDocs,
-    doc,
-    updateDoc
+    query,
+    orderBy
 } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
+import {
+    onAuthStateChanged,
+    signOut
+} from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
 
-const tbody = document.getElementById("ordersBody");
 
+const ADMIN_UID = "6LssLKjKdpZFkIXbz9MfEZFqTGv1";
+
+
+// ======================================
+// LOAD ORDERS
+// ======================================
 
 async function loadOrders() {
 
+    const tbody = document.getElementById("ordersBody");
+
+    if (!tbody) {
+        console.error("ordersBody not found");
+        return;
+    }
+
+    tbody.innerHTML = `
+        <tr>
+            <td colspan="13" class="loading">
+                Loading Orders...
+            </td>
+        </tr>
+    `;
+
     try {
 
-        table.innerHTML = "";
+        console.log("Loading orders...");
+        console.log("Current Firebase user:", auth.currentUser);
 
-        const snapshot = await getDocs(
-            collection(db, "orders")
+        const ordersQuery = query(
+            collection(db, "orders"),
+            orderBy("createdAt", "desc")
         );
 
+        const snapshot = await getDocs(ordersQuery);
+
+        console.log("Orders found:", snapshot.size);
 
         if (snapshot.empty) {
 
-            table.innerHTML = `
+            tbody.innerHTML = `
                 <tr>
-                    <td colspan="13" class="empty">
-                        No Orders Found
+                    <td colspan="13" class="loading">
+                        No orders found.
                     </td>
                 </tr>
             `;
@@ -36,129 +65,79 @@ async function loadOrders() {
         }
 
 
-        snapshot.forEach((document) => {
-
-            const order = document.data();
-
-            const id = document.id;
+        tbody.innerHTML = "";
 
 
-            // -----------------------------
-            // PAYMENT STATUS
-            // -----------------------------
+        snapshot.forEach((doc) => {
 
-            const paymentStatus =
-                order.paymentStatus ||
-                "Not Paid";
+            const order = doc.data();
+
+            const row = document.createElement("tr");
 
 
-            let paymentHTML = "";
-
-            if (
-                String(paymentStatus).toLowerCase() === "paid"
-            ) {
-
-                paymentHTML = `
-                    <span class="paid">
-                        ✅ Paid
-                    </span>
-                `;
-
-            } else {
-
-                paymentHTML = `
-                    <span class="not-paid">
-                        ❌ Not Paid
-                    </span>
-                `;
-
-            }
-
-
-            // -----------------------------
-            // ORDER STATUS
-            // -----------------------------
-
-            const orderStatus =
-                order.orderStatus ||
-                order.status ||
-                "Pending";
-
-
-            // -----------------------------
+            // ==================================
             // DATE
-            // -----------------------------
+            // ==================================
 
-            let orderDate = "";
+            let dateText = "-";
 
             if (order.createdAt) {
 
                 try {
 
-                    if (
-                        typeof order.createdAt.toDate ===
-                        "function"
-                    ) {
+                    if (typeof order.createdAt.toDate === "function") {
 
-                        orderDate =
+                        dateText =
                             order.createdAt
                                 .toDate()
                                 .toLocaleString();
 
                     } else {
 
-                        orderDate =
-                            new Date(
-                                order.createdAt
-                            ).toLocaleString();
+                        dateText =
+                            new Date(order.createdAt)
+                                .toLocaleString();
 
                     }
 
-                } catch (error) {
+                } catch (e) {
 
-                    orderDate = "";
+                    dateText = "-";
 
                 }
 
             }
 
 
-            // -----------------------------
-            // FRAME IMAGE
-            // -----------------------------
+            // ==================================
+            // IMAGE
+            // ==================================
 
-            const frameImage =
-                order.image ||
-                order.productImage ||
-                order.frameImage ||
-                "";
+            let imageHTML = "No Image";
 
+            if (order.photo) {
 
-            let frameImageHTML =
-                `<span class="no-photo">No Frame Image</span>`;
+                imageHTML = `
+                    <div class="photo-actions">
 
+                        <img
+                            src="${escapeHTML(order.photo)}"
+                            alt="Customer Photo"
+                            class="order-photo"
+                        >
 
-            if (frameImage) {
-
-                frameImageHTML = `
-                    <img
-                        src="${frameImage}"
-                        class="frame-image"
-                        alt="Frame Image"
-                    >
-
-                    <div class="photo-buttons">
+                        <br>
 
                         <a
-                            href="${frameImage}"
+                            href="${escapeHTML(order.photo)}"
                             target="_blank"
                             class="view-btn"
                         >
-                            🔍 View
+                            👁 View
                         </a>
 
                         <a
-                            href="${frameImage}"
+                            href="${escapeHTML(order.photo)}"
                             target="_blank"
                             download
                             class="download-btn"
@@ -172,203 +151,78 @@ async function loadOrders() {
             }
 
 
-            // -----------------------------
-            // CUSTOMER UPLOADED PHOTO
-            // -----------------------------
+            // ==================================
+            // PAYMENT
+            // ==================================
 
-            const customerPhoto =
-                order.photo ||
-                order.photoURL ||
-                "";
+            const paymentStatus =
+                order.paymentStatus ||
+                order.status ||
+                "Not Paid";
 
 
-            let customerPhotoHTML =
-                `<span class="no-photo">No Photo</span>`;
+            // ==================================
+            // ROW
+            // ==================================
 
+            row.innerHTML = `
 
-            if (customerPhoto) {
+                <td>
+                    ${escapeHTML(order.customerName || "-")}
+                </td>
 
-                customerPhotoHTML = `
-                    <img
-                        src="${customerPhoto}"
-                        class="customer-image"
-                        alt="Customer Photo"
-                    >
+                <td>
+                    ${escapeHTML(order.phone || "-")}
+                </td>
 
-                    <div class="photo-buttons">
+                <td>
+                    ${escapeHTML(order.address || "-")}
+                </td>
 
-                        <a
-                            href="${customerPhoto}"
-                            target="_blank"
-                            class="view-btn"
-                        >
-                            🔍 View
-                        </a>
+                <td>
+                    ${escapeHTML(order.frameName || "-")}
+                </td>
 
-                        <a
-                            href="${customerPhoto}"
-                            target="_blank"
-                            download
-                            class="download-btn"
-                        >
-                            ⬇ Download
-                        </a>
+                <td>
+                    ${imageHTML}
+                </td>
 
-                    </div>
-                `;
+                <td>
+                    ${order.quantity || 1}
+                </td>
 
-            }
+                <td>
+                    ₹${Number(order.price || 0).toFixed(2)}
+                </td>
 
+                <td>
+                    ${escapeHTML(paymentStatus)}
+                </td>
 
-            // -----------------------------
-            // ADD ROW
-            // -----------------------------
+                <td>
+                    ${escapeHTML(order.status || "Pending")}
+                </td>
 
-            table.innerHTML += `
+                <td>
+                    ${escapeHTML(order.message || "-")}
+                </td>
 
-                <tr>
+                <td>
+                    ₹${Number(order.orderTotal || 0).toFixed(2)}
+                </td>
 
-                    <!-- NAME -->
+                <td>
+                    ${escapeHTML(order.category || "-")}
+                </td>
 
-                    <td>
-                        ${order.customerName || ""}
-                    </td>
-
-
-                    <!-- PHONE -->
-
-                    <td>
-                        ${order.phone || ""}
-                    </td>
-
-
-                    <!-- ADDRESS -->
-
-                    <td>
-                        ${order.address || ""}
-                    </td>
-
-
-                    <!-- FRAME NAME -->
-
-                    <td>
-                        ${order.frameName || ""}
-                    </td>
-
-
-                    <!-- FRAME IMAGE -->
-
-                    <td>
-                        ${frameImageHTML}
-                    </td>
-
-
-                    <!-- QUANTITY -->
-
-                    <td>
-                        ${order.quantity || 1}
-                    </td>
-
-
-                    <!-- PRICE -->
-
-                    <td>
-                        ₹${Number(order.price || 0)}
-                    </td>
-
-
-                    <!-- CUSTOMER PHOTO -->
-
-                    <td>
-                        ${customerPhotoHTML}
-                    </td>
-
-
-                    <!-- MESSAGE -->
-
-                    <td>
-                        ${order.message || ""}
-                    </td>
-
-
-                    <!-- PAYMENT -->
-
-                    <td>
-                        ${paymentHTML}
-                    </td>
-
-
-                    <!-- STATUS -->
-
-                    <td>
-
-                        <select
-                            id="status-${id}"
-                        >
-
-                            <option
-                                value="Pending"
-                                ${
-                                    orderStatus === "Pending"
-                                        ? "selected"
-                                        : ""
-                                }
-                            >
-                                Pending
-                            </option>
-
-
-                            <option
-                                value="Confirmed"
-                                ${
-                                    orderStatus === "Confirmed"
-                                        ? "selected"
-                                        : ""
-                                }
-                            >
-                                Confirmed
-                            </option>
-
-
-                            <option
-                                value="Delivered"
-                                ${
-                                    orderStatus === "Delivered"
-                                        ? "selected"
-                                        : ""
-                                }
-                            >
-                                Delivered
-                            </option>
-
-                        </select>
-
-                    </td>
-
-
-                    <!-- UPDATE -->
-
-                    <td>
-
-                        <button
-                            class="update-btn"
-                            onclick="updateStatus('${id}')"
-                        >
-                            Update
-                        </button>
-
-                    </td>
-
-
-                    <!-- DATE -->
-
-                    <td>
-                        ${orderDate}
-                    </td>
-
-                </tr>
+                <td>
+                    ${escapeHTML(dateText)}
+                </td>
 
             `;
+
+
+            tbody.appendChild(row);
 
         });
 
@@ -376,25 +230,29 @@ async function loadOrders() {
     } catch (error) {
 
         console.error(
-            "Error loading orders:",
+            "FIRESTORE ORDER ERROR:",
             error
         );
 
 
-        table.innerHTML = `
+        tbody.innerHTML = `
 
             <tr>
 
                 <td
                     colspan="13"
-                    class="empty"
+                    style="
+                        color:red;
+                        padding:25px;
+                        text-align:center;
+                    "
                 >
 
                     ❌ Error loading orders
 
                     <br><br>
 
-                    ${error.message}
+                    ${escapeHTML(error.message)}
 
                 </td>
 
@@ -407,68 +265,118 @@ async function loadOrders() {
 }
 
 
+// ======================================
+// AUTH CHECK
+// ======================================
 
-// ------------------------------------
-// UPDATE ORDER STATUS
-// ------------------------------------
+onAuthStateChanged(auth, async (user) => {
 
-window.updateStatus = async function (id) {
-
-    try {
-
-        const select =
-            document.getElementById(
-                `status-${id}`
-            );
+    console.log("Auth state changed:", user);
 
 
-        if (!select) {
+    if (!user) {
 
-            alert("Status selector not found");
+        console.log("No user logged in.");
 
-            return;
+        const tbody =
+            document.getElementById("ordersBody");
+
+        if (tbody) {
+
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="13"
+                        style="
+                            color:red;
+                            text-align:center;
+                            padding:25px;
+                        "
+                    >
+                        ❌ Admin login required.
+                    </td>
+                </tr>
+            `;
 
         }
 
+        return;
+    }
 
-        const newStatus =
-            select.value;
+
+    console.log("Logged in UID:", user.uid);
 
 
-        await updateDoc(
+    // ==================================
+    // CHECK ADMIN UID
+    // ==================================
 
-            doc(
-                db,
-                "orders",
-                id
-            ),
+    if (user.uid !== ADMIN_UID) {
 
-            {
-                orderStatus: newStatus,
-                status: newStatus
-            }
-
+        console.error(
+            "Wrong admin account.",
+            user.uid
         );
 
+        const tbody =
+            document.getElementById("ordersBody");
 
-        alert(
-            "Order status updated successfully!"
-        );
+        if (tbody) {
+
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="13"
+                        style="
+                            color:red;
+                            text-align:center;
+                            padding:25px;
+                        "
+                    >
+                        ❌ This account is not the admin account.
+                    </td>
+                </tr>
+            `;
+
+        }
+
+        return;
+    }
 
 
-        await loadOrders();
+    console.log("✅ Admin UID verified");
 
+
+    // ==================================
+    // LOAD ORDERS
+    // ==================================
+
+    await loadOrders();
+
+});
+
+
+// ======================================
+// LOGOUT
+// ======================================
+
+window.logoutAdmin = async function () {
+
+    try {
+
+        await signOut(auth);
+
+        alert("Logged out successfully.");
+
+        window.location.href = "login.html";
 
     } catch (error) {
 
         console.error(
-            "Status update error:",
+            "Logout error:",
             error
         );
 
-
         alert(
-            "Update failed!\n\n" +
+            "Logout failed: " +
             error.message
         );
 
@@ -477,9 +385,21 @@ window.updateStatus = async function (id) {
 };
 
 
+// ======================================
+// ESCAPE HTML
+// ======================================
 
-// ------------------------------------
-// LOAD ORDERS
-// ------------------------------------
+function escapeHTML(value) {
 
-loadOrders();
+    if (value === null || value === undefined) {
+        return "";
+    }
+
+    return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+
+}
