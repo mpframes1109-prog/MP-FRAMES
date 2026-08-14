@@ -5,17 +5,11 @@
 
     <meta charset="UTF-8">
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>MP Frames - Products</title>
 
-    <link
-        rel="stylesheet"
-        href="style.css"
-    >
+    <link rel="stylesheet" href="style.css">
 
     <link
         rel="stylesheet"
@@ -24,338 +18,115 @@
 
     <style>
 
-        /* ==============================
-           PRODUCTS PAGE
-        ============================== */
-
         #products {
-
-            max-width: 1200px;
-
-            margin: 40px auto;
-
-            padding: 0 20px;
-
+            padding: 40px 20px;
+            min-height: 500px;
         }
-
 
         #products h2 {
-
             text-align: center;
-
-            margin-bottom: 25px;
-
-        }
-
-
-        /* ==============================
-           SEARCH + FILTER
-        ============================== */
-
-        .product-controls {
-
-            display: flex;
-
-            gap: 12px;
-
-            justify-content: center;
-
-            align-items: center;
-
             margin-bottom: 30px;
-
-            flex-wrap: wrap;
-
         }
-
-
-        .product-controls input {
-
-            width: 280px;
-
-            padding: 12px 15px;
-
-            border: 1px solid #ccc;
-
-            border-radius: 8px;
-
-            font-size: 15px;
-
-            outline: none;
-
-        }
-
-
-        .product-controls select {
-
-            width: 200px;
-
-            padding: 12px 15px;
-
-            border: 1px solid #ccc;
-
-            border-radius: 8px;
-
-            font-size: 15px;
-
-            background: white;
-
-            outline: none;
-
-        }
-
-
-        .product-controls input:focus,
-        .product-controls select:focus {
-
-            border-color: #111;
-
-        }
-
-
-        /* ==============================
-           PRODUCT GRID
-        ============================== */
 
         .product-container {
+            max-width: 1200px;
+            margin: auto;
 
             display: grid;
-
             grid-template-columns:
-                repeat(
-                    auto-fit,
-                    minmax(220px, 1fr)
-                );
+                repeat(auto-fit, minmax(230px, 1fr));
 
             gap: 25px;
-
         }
 
-
-        /* ==============================
-           PRODUCT CARD
-        ============================== */
-
-        .product-card {
-
-            background: #fff;
-
-            border-radius: 12px;
-
+        .product {
+            background: white;
+            border-radius: 10px;
             overflow: hidden;
 
             box-shadow:
-                0 4px 15px
-                rgba(0,0,0,0.10);
+                0 4px 12px rgba(0,0,0,0.15);
 
-            transition:
-                transform 0.2s ease,
-                box-shadow 0.2s ease;
-
+            transition: 0.3s;
         }
 
-
-        .product-card:hover {
-
-            transform:
-                translateY(-5px);
-
-            box-shadow:
-                0 8px 25px
-                rgba(0,0,0,0.16);
-
+        .product:hover {
+            transform: translateY(-5px);
         }
 
-
-        .product-card img {
-
+        .product img {
             width: 100%;
-
-            height: 250px;
+            height: 240px;
 
             object-fit: cover;
 
             display: block;
-
-            background: #f5f5f5;
-
         }
 
-
-        .product-info {
-
-            padding: 18px;
-
+        .product-content {
+            padding: 15px;
+            text-align: center;
         }
 
-
-        .product-info h3 {
-
-            margin:
-                0 0 8px;
-
-            font-size: 19px;
-
+        .product-content h3 {
+            margin: 8px 0;
         }
 
-
-        .product-info p {
-
-            margin:
-                0 0 10px;
-
-            color: #777;
-
-            font-size: 14px;
-
-        }
-
-
-        .product-info h4 {
-
-            margin:
-                0 0 15px;
-
+        .price {
             font-size: 20px;
-
+            font-weight: bold;
+            margin: 10px 0;
         }
 
+        .category {
+            color: #666;
+            margin-bottom: 12px;
+        }
 
-        /* ==============================
-           BUTTONS
-        ============================== */
-
-        .product-info button {
-
+        .product-content button {
             width: 100%;
-
-            padding: 11px;
+            padding: 12px;
 
             border: none;
-
-            border-radius: 7px;
-
-            margin-top: 8px;
-
-            cursor: pointer;
-
-            font-size: 14px;
-
-        }
-
-
-        .product-info button:first-of-type {
+            border-radius: 6px;
 
             background: #111;
-
             color: white;
 
+            font-size: 16px;
+            cursor: pointer;
         }
 
-
-        .product-info button:last-of-type {
-
-            background: #25D366;
-
-            color: white;
-
+        .product-content button:hover {
+            background: #333;
         }
 
-
-        .product-info button:hover {
-
-            opacity: 0.88;
-
+        #loading {
+            text-align: center;
+            font-size: 18px;
+            padding: 50px;
         }
 
-
-        /* ==============================
-           LOADING
-        ============================== */
-
-        .loading {
+        #error-message {
+            display: none;
 
             text-align: center;
 
-            padding: 40px;
+            padding: 30px;
 
-            font-size: 18px;
-
-            color: #777;
-
+            color: #b00020;
         }
 
+        .retry-btn {
+            padding: 10px 20px;
 
-        /* ==============================
-           MOBILE
-        ============================== */
+            border: none;
+            border-radius: 6px;
 
-        @media (max-width: 600px) {
+            background: #111;
+            color: white;
 
-            #products {
-
-                margin-top: 25px;
-
-                padding:
-                    0 12px;
-
-            }
-
-
-            .product-controls {
-
-                flex-direction: column;
-
-            }
-
-
-            .product-controls input,
-            .product-controls select {
-
-                width: 100%;
-
-                box-sizing: border-box;
-
-            }
-
-
-            .product-container {
-
-                grid-template-columns:
-                    repeat(2, 1fr);
-
-                gap: 12px;
-
-            }
-
-
-            .product-card img {
-
-                height: 180px;
-
-            }
-
-
-            .product-info {
-
-                padding: 12px;
-
-            }
-
-
-            .product-info h3 {
-
-                font-size: 16px;
-
-            }
-
-
-            .product-info h4 {
-
-                font-size: 17px;
-
-            }
-
+            cursor: pointer;
         }
 
     </style>
@@ -365,10 +136,6 @@
 
 <body>
 
-
-<!-- ==============================
-     HEADER
-============================== -->
 
 <header>
 
@@ -397,12 +164,9 @@
             Contact
         </a>
 
-
         <a href="cart.html">
 
-            <i
-                class="fa-solid fa-cart-shopping"
-            ></i>
+            <i class="fa-solid fa-cart-shopping"></i>
 
             <span id="cart-count">
                 0
@@ -416,342 +180,430 @@
 
 
 
-<!-- ==============================
-     PRODUCTS
-============================== -->
-
 <section id="products">
-
 
     <h2>
         Our Photo Frames
     </h2>
 
 
-    <!-- SEARCH + CATEGORY -->
-
-    <div class="product-controls">
-
-
-        <input
-            type="text"
-            id="search"
-            placeholder="Search frames..."
-        >
-
-
-        <select
-            id="categoryFilter"
-        >
-
-            <option value="">
-                All Categories
-            </option>
-
-        </select>
-
-
+    <div
+        id="loading"
+    >
+        Loading products...
     </div>
 
 
+    <div
+        id="error-message"
+    >
 
-    <!-- PRODUCT CONTAINER -->
+        <p>
+            Unable to load products.
+        </p>
+
+        <p id="error-text"></p>
+
+        <button
+            class="retry-btn"
+            onclick="loadProducts()"
+        >
+            Retry
+        </button>
+
+    </div>
+
 
     <div
         class="product-container"
         id="product-container"
     >
-
-        <div class="loading">
-            Loading products...
-        </div>
-
     </div>
-
 
 </section>
 
 
 
-<!-- ==============================
-     FOOTER
-============================== -->
-
 <footer>
 
     <p>
-        © 2026 MP Frames.
-        All Rights Reserved.
+        © 2026 MP Frames. All Rights Reserved.
     </p>
 
 </footer>
 
 
 
-<!-- ==============================
-     PRODUCTS JS
-============================== -->
+<script type="module">
 
-<script><script type="module">
-
-import { db } from "./firebase.js";
-
-import {
-    collection,
-    getDocs
-} from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+    import { db } from "./firebase.js";
 
 
-const container =
-    document.getElementById("product-container");
+    import {
+
+        collection,
+
+        getDocs
+
+    } from
+    "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
 
-async function loadProducts() {
 
-    try {
-
-        container.innerHTML =
-            "<p style='text-align:center;'>Loading products...</p>";
-
-
-        const snapshot =
-            await getDocs(
-                collection(db, "products")
-            );
-
-
-        console.log(
-            "Products found:",
-            snapshot.size
+    const container =
+        document.getElementById(
+            "product-container"
         );
 
 
-        if (snapshot.empty) {
+    const loading =
+        document.getElementById(
+            "loading"
+        );
 
-            container.innerHTML =
-                "<p style='text-align:center;'>No products found.</p>";
 
-            return;
-        }
+    const errorBox =
+        document.getElementById(
+            "error-message"
+        );
 
+
+    const errorText =
+        document.getElementById(
+            "error-text"
+        );
+
+
+
+    // =========================
+    // LOAD PRODUCTS
+    // =========================
+
+    async function loadProducts() {
+
+        loading.style.display = "block";
+
+        errorBox.style.display = "none";
 
         container.innerHTML = "";
 
 
-        snapshot.forEach((docSnap) => {
-
-            const product =
-                docSnap.data();
-
+        try {
 
             console.log(
-                "Product:",
-                product
+                "Loading products from Firestore..."
             );
 
 
-            const card =
-                document.createElement("div");
+            const snapshot =
+                await getDocs(
+                    collection(
+                        db,
+                        "products"
+                    )
+                );
 
-            card.className =
-                "product";
+
+            console.log(
+                "Products found:",
+                snapshot.size
+            );
 
 
-            card.innerHTML = `
+            loading.style.display = "none";
 
-                <img
-                    src="${product.image || ""}"
-                    alt="${product.name || "Product"}"
-                    onerror="this.src='https://via.placeholder.com/300x300?text=Image+Error'"
-                >
 
-                <div class="product-content">
+            if (snapshot.empty) {
 
-                    <h3>
-                        ${product.name || "Unnamed Product"}
-                    </h3>
+                container.innerHTML = `
 
-                    <p class="price">
-                        ₹${Number(product.price) || 0}
-                    </p>
-
-                    <button
-                        class="view-product"
+                    <div
+                        style="
+                            grid-column:1/-1;
+                            text-align:center;
+                            padding:40px;
+                        "
                     >
-                        View Product
-                    </button>
 
-                    <button
-                        class="add-cart"
+                        <h3>
+                            No products found
+                        </h3>
+
+                        <p>
+                            Add products from the admin panel.
+                        </p>
+
+                    </div>
+
+                `;
+
+                return;
+
+            }
+
+
+
+            snapshot.forEach((doc) => {
+
+                const product =
+                    doc.data();
+
+
+                console.log(
+                    "Product:",
+                    product
+                );
+
+
+                const card =
+                    document.createElement(
+                        "div"
+                    );
+
+
+                card.className =
+                    "product";
+
+
+
+                const image =
+                    product.image || "";
+
+                const name =
+                    product.name || "Frame";
+
+                const price =
+                    Number(product.price || 0);
+
+                const category =
+                    product.category || "Photo";
+
+
+
+                card.innerHTML = `
+
+                    <img
+                        src="${image}"
+                        alt="${name}"
+                        onerror="
+                            this.style.display='none';
+                        "
                     >
-                        Add To Cart
-                    </button>
 
-                </div>
+                    <div
+                        class="product-content"
+                    >
 
-            `;
+                        <h3>
+                            ${name}
+                        </h3>
 
 
-            /* VIEW PRODUCT */
+                        <p class="price">
+                            ₹${price}
+                        </p>
 
-            card
-                .querySelector(".view-product")
-                .addEventListener(
+
+                        <p class="category">
+                            ${category}
+                        </p>
+
+
+                        <button
+                            class="add-cart-button"
+                        >
+                            Add To Cart
+                        </button>
+
+                    </div>
+
+                `;
+
+
+
+                const button =
+                    card.querySelector(
+                        ".add-cart-button"
+                    );
+
+
+                button.addEventListener(
                     "click",
-                    () => {
+                    function() {
 
-                        localStorage.setItem(
-                            "selectedProduct",
-                            JSON.stringify({
+                        addToCart({
 
-                                id: docSnap.id,
+                            id: doc.id,
 
-                                name:
-                                    product.name || "",
+                            name: name,
 
-                                price:
-                                    Number(product.price) || 0,
+                            price: price,
 
-                                image:
-                                    product.image || "",
+                            image: image,
 
-                                category:
-                                    product.category || ""
+                            category: category,
 
-                            })
-                        );
+                            quantity: 1
 
-
-                        window.location.href =
-                            "product.html";
+                        });
 
                     }
                 );
 
 
-            /* ADD TO CART */
 
-            card
-                .querySelector(".add-cart")
-                .addEventListener(
-                    "click",
-                    () => {
-
-                        let cart =
-                            JSON.parse(
-                                localStorage.getItem(
-                                    "cart"
-                                )
-                            ) || [];
-
-
-                        const existing =
-                            cart.find(
-                                item =>
-                                    item.id ===
-                                    docSnap.id
-                            );
-
-
-                        if (existing) {
-
-                            existing.quantity =
-                                (
-                                    Number(
-                                        existing.quantity
-                                    ) || 1
-                                ) + 1;
-
-                        } else {
-
-                            cart.push({
-
-                                id:
-                                    docSnap.id,
-
-                                name:
-                                    product.name || "",
-
-                                price:
-                                    Number(
-                                        product.price
-                                    ) || 0,
-
-                                image:
-                                    product.image || "",
-
-                                category:
-                                    product.category || "",
-
-                                quantity: 1
-
-                            });
-
-                        }
-
-
-                        localStorage.setItem(
-                            "cart",
-                            JSON.stringify(cart)
-                        );
-
-
-                        alert(
-                            "Product Added To Cart"
-                        );
-
-                    }
+                container.appendChild(
+                    card
                 );
 
-
-            container.appendChild(card);
-
-        });
+            });
 
 
-    } catch (error) {
+        }
 
-        console.error(
-            "PRODUCT LOAD ERROR:",
-            error
-        );
+        catch (error) {
+
+            console.error(
+                "Firestore error:",
+                error
+            );
 
 
-        container.innerHTML = `
+            loading.style.display =
+                "none";
 
-            <div
-                style="
-                    text-align:center;
-                    padding:30px;
-                    color:red;
-                "
-            >
 
-                <h3>
-                    Products could not be loaded
-                </h3>
+            errorBox.style.display =
+                "block";
 
-                <p>
-                    ${error.code || ""}
-                </p>
 
-                <p>
-                    ${error.message || ""}
-                </p>
+            errorText.innerText =
+                error.message;
 
-            </div>
-
-        `;
+        }
 
     }
 
-}
 
 
-loadProducts();
+    // =========================
+    // ADD TO CART
+    // =========================
+
+    function addToCart(product) {
+
+
+        let cart =
+            JSON.parse(
+                localStorage.getItem(
+                    "cart"
+                )
+            ) || [];
+
+
+
+        const existing =
+            cart.find(
+                item =>
+                    item.id === product.id
+            );
+
+
+
+        if (existing) {
+
+            existing.quantity =
+                (existing.quantity || 1) + 1;
+
+        }
+
+        else {
+
+            cart.push(product);
+
+        }
+
+
+
+        localStorage.setItem(
+            "cart",
+            JSON.stringify(cart)
+        );
+
+
+
+        updateCartCount();
+
+
+
+        alert(
+            "Product Added To Cart"
+        );
+
+    }
+
+
+
+    // =========================
+    // CART COUNT
+    // =========================
+
+    function updateCartCount() {
+
+
+        const cart =
+            JSON.parse(
+                localStorage.getItem(
+                    "cart"
+                )
+            ) || [];
+
+
+
+        let count = 0;
+
+
+        cart.forEach(
+            item => {
+
+                count +=
+                    Number(
+                        item.quantity || 1
+                    );
+
+            }
+        );
+
+
+
+        const cartCount =
+            document.getElementById(
+                "cart-count"
+            );
+
+
+        if (cartCount) {
+
+            cartCount.innerText =
+                count;
+
+        }
+
+    }
+
+
+
+    // =========================
+    // START
+    // =========================
+
+    updateCartCount();
+
+
+    loadProducts();
+
 
 </script>
-    
 
 
 </body>
