@@ -46,8 +46,76 @@
 
 </footer>
 
-<script src="products.js"></script>
-<script src="script.js"></script>
+
+<script type="module">
+import { db } from "./firebase.js";
+
+import {
+  collection,
+  getDocs
+} from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+
+const container = document.getElementById("product-container");
+
+async function loadProducts() {
+
+    container.innerHTML = "";
+
+    const snapshot = await getDocs(collection(db, "products"));
+
+    snapshot.forEach((doc) => {
+
+        const product = doc.data();
+
+        container.innerHTML += `
+        <div class="product">
+
+            <img src="${product.image}" alt="${product.name}">
+
+            <div class="product-content">
+
+                <h3>${product.name}</h3>
+
+                <p class="price">₹${product.price}</p>
+
+                <button onclick="addToCart(
+                    '${doc.id}',
+                    '${product.name}',
+                    ${product.price},
+                    '${product.image}'
+                )">
+                    Add To Cart
+                </button>
+
+            </div>
+
+        </div>
+        `;
+    });
+
+}
+
+window.addToCart = function(id, name, price, image){
+
+    let cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+    cart.push({
+        id,
+        name,
+        price,
+        image,
+        quantity:1
+    });
+
+    localStorage.setItem("cart", JSON.stringify(cart));
+
+    alert("Product Added To Cart");
+
+}
+
+loadProducts();
+
+</script>
 
 </body>
 </html>
