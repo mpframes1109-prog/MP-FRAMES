@@ -1,129 +1,672 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+
 <head>
-    <title>MP Frames - Orders</title>
 
-    <style>
-        body{
-            font-family:Arial;
-            background:#f5f5f5;
-            padding:30px;
-        }
+<meta charset="UTF-8">
 
-        h1{
-            text-align:center;
-        }
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
 
-        table{
-            width:100%;
-            border-collapse:collapse;
-            background:white;
-        }
+<title>MP Frames - Admin Dashboard</title>
 
-        th,td{
-            border:1px solid #ddd;
-            padding:12px;
-            text-align:center;
-        }
+<style>
 
-        th{
-            background:#000;
-            color:white;
-        }
+* {
+    box-sizing: border-box;
+}
 
-        img{
-            width:80px;
-            height:80px;
-            object-fit:cover;
-            border-radius:8px;
-        }
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f5f6f8;
+    color: #111;
+}
 
-        select{
-            padding:5px;
-        }
+/* =========================
+   SIDEBAR
+========================= */
 
-        button{
-            background:#25D366;
-            color:white;
-            border:none;
-            padding:8px 12px;
-            cursor:pointer;
-        }
-    </style>
+.sidebar {
+
+    position: fixed;
+
+    left: 0;
+    top: 0;
+
+    width: 240px;
+    height: 100vh;
+
+    background: #111;
+    color: white;
+
+    padding: 25px 15px;
+
+}
+
+.logo {
+
+    text-align: center;
+
+    font-size: 24px;
+
+    font-weight: bold;
+
+    margin-bottom: 35px;
+
+}
+
+.menu {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 8px;
+
+}
+
+.menu a {
+
+    color: #ddd;
+
+    text-decoration: none;
+
+    padding: 14px 16px;
+
+    border-radius: 8px;
+
+    display: block;
+
+}
+
+.menu a:hover,
+.menu a.active {
+
+    background: #25D366;
+
+    color: white;
+
+}
+
+
+/* =========================
+   MAIN
+========================= */
+
+.main {
+
+    margin-left: 240px;
+
+    padding: 25px;
+
+}
+
+
+/* =========================
+   TOP BAR
+========================= */
+
+.topbar {
+
+    background: white;
+
+    padding: 18px 22px;
+
+    border-radius: 12px;
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    margin-bottom: 25px;
+
+    box-shadow:
+        0 3px 12px rgba(0,0,0,.06);
+
+}
+
+.topbar h1 {
+
+    margin: 0;
+
+    font-size: 24px;
+
+}
+
+.logout {
+
+    background: #111;
+
+    color: white;
+
+    border: none;
+
+    padding: 10px 18px;
+
+    border-radius: 7px;
+
+    cursor: pointer;
+
+}
+
+
+/* =========================
+   CARDS
+========================= */
+
+.cards {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(4, 1fr);
+
+    gap: 18px;
+
+    margin-bottom: 25px;
+
+}
+
+.card {
+
+    background: white;
+
+    padding: 22px;
+
+    border-radius: 12px;
+
+    box-shadow:
+        0 3px 12px rgba(0,0,0,.06);
+
+}
+
+.card h3 {
+
+    margin: 0;
+
+    color: #777;
+
+    font-size: 14px;
+
+}
+
+.card p {
+
+    margin:
+        10px 0 0;
+
+    font-size: 28px;
+
+    font-weight: bold;
+
+}
+
+
+/* =========================
+   ORDERS
+========================= */
+
+.orders-box {
+
+    background: white;
+
+    border-radius: 12px;
+
+    padding: 20px;
+
+    box-shadow:
+        0 3px 12px rgba(0,0,0,.06);
+
+}
+
+.orders-header {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    margin-bottom: 18px;
+
+}
+
+.orders-header h2 {
+
+    margin: 0;
+
+}
+
+
+/* =========================
+   TABLE
+========================= */
+
+.table-wrapper {
+
+    overflow-x: auto;
+
+}
+
+table {
+
+    width: 100%;
+
+    border-collapse: collapse;
+
+    min-width: 1100px;
+
+}
+
+th {
+
+    background: #111;
+
+    color: white;
+
+    padding: 13px;
+
+    text-align: center;
+
+    font-size: 14px;
+
+}
+
+td {
+
+    border-bottom:
+        1px solid #eee;
+
+    padding: 12px;
+
+    text-align: center;
+
+    font-size: 14px;
+
+}
+
+tr:hover {
+
+    background: #fafafa;
+
+}
+
+
+/* =========================
+   PHOTO
+========================= */
+
+.order-photo {
+
+    width: 70px;
+
+    height: 70px;
+
+    object-fit: cover;
+
+    border-radius: 8px;
+
+    border:
+        1px solid #ddd;
+
+}
+
+
+/* =========================
+   STATUS
+========================= */
+
+.status {
+
+    padding: 7px 10px;
+
+    border-radius: 6px;
+
+    border: 1px solid #ddd;
+
+}
+
+
+/* =========================
+   BUTTON
+========================= */
+
+.update-btn {
+
+    background: #25D366;
+
+    color: white;
+
+    border: none;
+
+    padding: 8px 13px;
+
+    border-radius: 6px;
+
+    cursor: pointer;
+
+}
+
+.update-btn:hover {
+
+    background: #1ebc57;
+
+}
+
+
+/* =========================
+   DOWNLOAD
+========================= */
+
+.download-btn {
+
+    display: inline-block;
+
+    margin-top: 5px;
+
+    padding: 6px 9px;
+
+    background: #111;
+
+    color: white;
+
+    text-decoration: none;
+
+    border-radius: 5px;
+
+    font-size: 12px;
+
+}
+
+
+/* =========================
+   MOBILE
+========================= */
+
+@media (max-width: 900px) {
+
+    .sidebar {
+
+        position: relative;
+
+        width: 100%;
+
+        height: auto;
+
+    }
+
+    .menu {
+
+        flex-direction: row;
+
+        overflow-x: auto;
+
+    }
+
+    .main {
+
+        margin-left: 0;
+
+    }
+
+    .cards {
+
+        grid-template-columns:
+            repeat(2, 1fr);
+
+    }
+
+}
+
+@media (max-width: 550px) {
+
+    .cards {
+
+        grid-template-columns: 1fr;
+
+    }
+
+    .main {
+
+        padding: 12px;
+
+    }
+
+}
+
+</style>
+
 </head>
+
 
 <body>
 
-<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
 
-    <h1>Customer Orders</h1>
+<!-- =========================
+     SIDEBAR
+========================= -->
 
-    <button id="logoutBtn">
-        🚪 Logout
-    </button>
+<aside class="sidebar">
 
-</div>
+    <div class="logo">
+        MP FRAMES
+    </div>
 
-<table>
+    <div class="menu">
 
-<thead>
+        <a
+            href="admin.html"
+        >
+            🏠 Dashboard
+        </a>
 
-<tr>
+        <a
+            href="admin.html"
+        >
+            📦 Products
+        </a>
 
-<th>Name</th>
+        <a
+            href="admin-orders.html"
+            class="active"
+        >
+            🛒 Orders
+        </a>
 
-<th>Phone</th>
+        <a
+            href="index.html"
+        >
+            🌐 Website
+        </a>
 
-<th>Address</th>
+    </div>
 
-<th>Frame</th>
+</aside>
 
-<th>Message</th>
 
-<th>Photo</th>
+<!-- =========================
+     MAIN
+========================= -->
 
-<th>Status</th>
+<main class="main">
 
-<th>Update</th>
 
-</tr>
+    <!-- TOP BAR -->
 
-</thead>
+    <div class="topbar">
 
-<tbody id="ordersTable">
+        <h1>
+            Customer Orders
+        </h1>
 
-</tbody>
+        <button
+            class="logout"
+            id="logoutBtn"
+        >
+            Logout
+        </button>
 
-</table>
+    </div>
 
-<script type="module" src="admin-orders.js"></script>
-<script type="module">
-    console.log("MP Frames notification system starting...");
 
-    import("./firebase-messaging.js")
-        .then(async (module) => {
+    <!-- STATISTICS -->
 
-            console.log("Firebase messaging loaded ✅");
+    <div class="cards">
 
-            const token =
-                await module.requestNotificationPermission();
+        <div class="card">
 
-            if (token) {
-                console.log("Admin notification enabled ✅");
-            } else {
-                console.log("Notification token not generated ❌");
-            }
+            <h3>
+                Total Orders
+            </h3>
 
-        })
-        .catch((error) => {
+            <p id="totalOrders">
+                0
+            </p>
 
-            console.error(
-                "Firebase messaging loading error ❌",
-                error
-            );
+        </div>
 
-        });
-</script>
+
+        <div class="card">
+
+            <h3>
+                Pending
+            </h3>
+
+            <p id="pendingOrders">
+                0
+            </p>
+
+        </div>
+
+
+        <div class="card">
+
+            <h3>
+                Confirmed
+            </h3>
+
+            <p id="confirmedOrders">
+                0
+            </p>
+
+        </div>
+
+
+        <div class="card">
+
+            <h3>
+                Delivered
+            </h3>
+
+            <p id="deliveredOrders">
+                0
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <!-- ORDERS -->
+
+    <section class="orders-box">
+
+        <div class="orders-header">
+
+            <h2>
+                Orders
+            </h2>
+
+        </div>
+
+
+        <div class="table-wrapper">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            Name
+                        </th>
+
+                        <th>
+                            Phone
+                        </th>
+
+                        <th>
+                            Address
+                        </th>
+
+                        <th>
+                            Frame
+                        </th>
+
+                        <th>
+                            Quantity
+                        </th>
+
+                        <th>
+                            Price
+                        </th>
+
+                        <th>
+                            Photo
+                        </th>
+
+                        <th>
+                            Payment
+                        </th>
+
+                        <th>
+                            Status
+                        </th>
+
+                        <th>
+                            Update
+                        </th>
+
+                        <th>
+                            Date
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody
+                    id="ordersTable"
+                >
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </section>
+
+</main>
+
+
+<!-- =========================
+     ORDERS JS
+========================= -->
+
+<script
+    type="module"
+    src="admin-orders.js"
+></script>
+
+
 </body>
 
 </html>
