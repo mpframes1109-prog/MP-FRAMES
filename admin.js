@@ -1,4 +1,4 @@
-import { app, db } from "./firebase.js";
+import { db } from "./firebase.js";
 
 import {
   collection,
@@ -10,53 +10,72 @@ import {
 
 const productList = document.getElementById("product-list");
 
-// Load Products
-async function loadProducts() {
+// Add Product
+window.addProduct = async function () {
 
-    productList.innerHTML = "";
+    const name = document.getElementById("name").value.trim();
+    const price = document.getElementById("price").value.trim();
+    const image = document.getElementById("image").value.trim();
 
-    const querySnapshot = await getDocs(collection(db, "products"));
-
-    querySnapshot.forEach((document) => {
-
-        const product = document.data();
-
-        productList.innerHTML += `
-        <div class="card">
-            <img src="${product.image}" width="150">
-
-            <h3>${product.name}</h3>
-
-            <p>₹${product.price}</p>
-
-            <button onclick="deleteProduct('${document.id}')">
-            Delete
-            </button>
-
-        </div>
-        `;
-    });
-
-}
-
-async function addProduct(){
-
-    const name = document.getElementById("name").value;
-    const price = document.getElementById("price").value;
-    const image = document.getElementById("image").value;
+    if(name==="" || price==="" || image===""){
+        alert("Please fill all fields");
+        return;
+    }
 
     await addDoc(collection(db,"products"),{
-
         name:name,
         price:Number(price),
         image:image
+    });
+
+    document.getElementById("name").value="";
+    document.getElementById("price").value="";
+    document.getElementById("image").value="";
+
+    alert("Product Added Successfully");
+
+    loadProducts();
+
+}
+
+// Load Products
+async function loadProducts(){
+
+    productList.innerHTML="";
+
+    const snapshot=await getDocs(collection(db,"products"));
+
+    snapshot.forEach((item)=>{
+
+        const product=item.data();
+
+        productList.innerHTML+=`
+        <div style="
+        background:white;
+        padding:15px;
+        border-radius:10px;
+        text-align:center;
+        box-shadow:0 0 10px rgba(0,0,0,.1);
+        ">
+
+        <img src="${product.image}" width="180">
+
+        <h3>${product.name}</h3>
+
+        <h4>₹${product.price}</h4>
+
+        <button onclick="deleteProduct('${item.id}')">
+        Delete
+        </button>
+
+        </div>
+        `;
 
     });
 
-    alert("Product Added");
-
-  
 }
+
+// Delete Product
 window.deleteProduct = async function(id){
 
     await deleteDoc(doc(db,"products",id));
@@ -64,3 +83,5 @@ window.deleteProduct = async function(id){
     loadProducts();
 
 }
+
+loadProducts();
