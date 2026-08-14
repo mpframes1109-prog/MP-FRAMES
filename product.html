@@ -1,254 +1,771 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Product Details - MP Frames</title>
 
-<link rel="stylesheet" href="style.css">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <meta charset="UTF-8">
 
-<style>
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
-body{
-    font-family:Arial,sans-serif;
-    margin:0;
-    background:#f5f5f5;
-}
+    <title>Product Details - MP Frames</title>
 
-header{
-    background:#111;
-    color:#fff;
-    padding:15px 30px;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-}
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
 
-header h1{
-    margin:0;
-}
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    >
 
-header a{
-    color:#fff;
-    text-decoration:none;
-    font-size:20px;
-}
+    <style>
 
-.container{
-    max-width:1100px;
-    margin:40px auto;
-    display:flex;
-    flex-wrap:wrap;
-    gap:40px;
-    background:#fff;
-    padding:30px;
-    border-radius:10px;
-    box-shadow:0 0 10px rgba(0,0,0,.15);
-}
+        * {
+            box-sizing: border-box;
+        }
 
-.left{
-    flex:1;
-}
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+            color: #111;
+        }
 
-.left img{
-    width:100%;
-    border-radius:10px;
-}
+        /* HEADER */
 
-.right{
-    flex:1;
-}
+        header {
+            background: #111;
+            color: white;
+            padding: 15px 30px;
 
-.right h1{
-    font-size:32px;
-}
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
 
-.category{
-    color:#666;
-    margin:15px 0;
-}
+        header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
 
-.price{
-    color:#e91e63;
-    font-size:32px;
-    font-weight:bold;
-}
+        .cart-link {
+            color: white;
+            text-decoration: none;
+            font-size: 21px;
+        }
 
-.description{
-    margin-top:20px;
-    line-height:1.8;
-}
+        #cart-count {
+            background: #25D366;
+            color: white;
 
-button{
-    margin-top:20px;
-    padding:15px 30px;
-    border:none;
-    border-radius:8px;
-    cursor:pointer;
-    font-size:18px;
-}
+            min-width: 20px;
+            height: 20px;
 
-.cart{
-    background:#111;
-    color:#fff;
-}
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
 
-.cart:hover{
-    background:gold;
-    color:#000;
-}
+            border-radius: 50%;
 
-.buy{
-    background:#25D366;
-    color:#fff;
-    margin-left:10px;
-}
+            font-size: 12px;
+            margin-left: 4px;
+        }
 
-.buy:hover{
-    background:#1ebc57;
-}
+        /* BACK BUTTON */
 
-.back{
-    display:inline-block;
-    margin:20px;
-    text-decoration:none;
-    color:#111;
-    font-weight:bold;
-}
+        .back {
+            display: inline-block;
 
-</style>
+            margin: 25px;
+
+            color: #111;
+            text-decoration: none;
+
+            font-weight: bold;
+        }
+
+        .back:hover {
+            text-decoration: underline;
+        }
+
+        /* PRODUCT */
+
+        .product-container {
+            max-width: 1100px;
+
+            margin: 20px auto 50px;
+
+            padding: 30px;
+
+            background: white;
+
+            border-radius: 15px;
+
+            box-shadow:
+                0 5px 20px rgba(0, 0, 0, 0.10);
+
+            display: grid;
+
+            grid-template-columns:
+                minmax(0, 1fr)
+                minmax(0, 1fr);
+
+            gap: 45px;
+        }
+
+        /* IMAGE */
+
+        .product-image-section {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .product-image {
+            width: 100%;
+            max-width: 500px;
+
+            height: 500px;
+
+            object-fit: contain;
+
+            border-radius: 12px;
+
+            background: #f7f7f7;
+        }
+
+        /* DETAILS */
+
+        .product-details {
+            padding: 15px 5px;
+        }
+
+        .product-details h2 {
+            font-size: 34px;
+            margin: 0 0 15px;
+        }
+
+        .category {
+            color: #777;
+            font-size: 16px;
+
+            margin-bottom: 15px;
+        }
+
+        .price {
+            font-size: 32px;
+            font-weight: bold;
+
+            margin: 15px 0;
+
+            color: #e91e63;
+        }
+
+        .description {
+            line-height: 1.8;
+
+            color: #555;
+
+            margin-top: 25px;
+        }
+
+        .features {
+            margin-top: 20px;
+
+            line-height: 2;
+        }
+
+        /* BUTTONS */
+
+        .buttons {
+            display: flex;
+
+            gap: 12px;
+
+            margin-top: 30px;
+        }
+
+        .buttons button {
+
+            flex: 1;
+
+            padding: 15px;
+
+            border: none;
+
+            border-radius: 8px;
+
+            cursor: pointer;
+
+            font-size: 16px;
+
+            font-weight: bold;
+        }
+
+        .add-cart {
+            background: #111;
+            color: white;
+        }
+
+        .add-cart:hover {
+            background: #333;
+        }
+
+        .buy-now {
+            background: #25D366;
+            color: white;
+        }
+
+        .buy-now:hover {
+            background: #1ebc57;
+        }
+
+        /* LOADING */
+
+        .loading {
+            max-width: 1100px;
+
+            margin: 60px auto;
+
+            padding: 50px;
+
+            text-align: center;
+
+            background: white;
+
+            border-radius: 12px;
+        }
+
+        /* MOBILE */
+
+        @media (max-width: 768px) {
+
+            header {
+                padding: 14px 18px;
+            }
+
+            header h1 {
+                font-size: 20px;
+            }
+
+            .product-container {
+                grid-template-columns: 1fr;
+
+                margin: 10px 12px 40px;
+
+                padding: 18px;
+
+                gap: 20px;
+            }
+
+            .product-image {
+                height: 350px;
+            }
+
+            .product-details h2 {
+                font-size: 27px;
+            }
+
+            .price {
+                font-size: 27px;
+            }
+
+            .buttons {
+                flex-direction: column;
+            }
+
+            .back {
+                margin: 20px 15px;
+            }
+        }
+
+    </style>
 
 </head>
 
+
 <body>
+
+
+<!-- HEADER -->
 
 <header>
 
-<h1>MP Frames</h1>
+    <h1>
+        MP Frames
+    </h1>
 
-<a href="cart.html">
-    <i class="fa-solid fa-cart-shopping"></i>
-    <span id="cart-count">0</span>
-</a>
+    <a
+        href="cart.html"
+        class="cart-link"
+    >
+
+        <i class="fa-solid fa-cart-shopping"></i>
+
+        <span id="cart-count">
+            0
+        </span>
+
+    </a>
 
 </header>
 
-<a href="products.html" class="back">
-← Back to Products
+
+<!-- BACK -->
+
+<a
+    href="products.html"
+    class="back"
+>
+    ← Back to Products
 </a>
 
-<div class="container">
 
-<div class="left">
+<!-- LOADING -->
 
-<img id="productImage" alt="Product Image">
+<div
+    id="loading"
+    class="loading"
+>
+    Loading product...
+</div>
+
+
+<!-- PRODUCT -->
+
+<div
+    id="productContainer"
+    class="product-container"
+    style="display:none;"
+>
+
+
+    <!-- IMAGE -->
+
+    <div class="product-image-section">
+
+        <img
+            id="productImage"
+            class="product-image"
+            alt="Product Image"
+        >
+
+    </div>
+
+
+    <!-- DETAILS -->
+
+    <div class="product-details">
+
+        <h2 id="productName">
+        </h2>
+
+
+        <div
+            id="productCategory"
+            class="category"
+        >
+        </div>
+
+
+        <div
+            id="productPrice"
+            class="price"
+        >
+        </div>
+
+
+        <div class="description">
+
+            <strong>
+                Premium Quality Photo Frame
+            </strong>
+
+            <p>
+                Create beautiful memories with
+                our premium quality photo frames.
+            </p>
+
+        </div>
+
+
+        <div class="features">
+
+            ✔ High Quality Finish<br>
+
+            ✔ Long Lasting Material<br>
+
+            ✔ Perfect for Home Decoration<br>
+
+            ✔ Best Gift Choice
+
+        </div>
+
+
+        <!-- BUTTONS -->
+
+        <div class="buttons">
+
+            <button
+                class="add-cart"
+                onclick="addToCart()"
+            >
+                🛒 Add To Cart
+            </button>
+
+
+            <button
+                class="buy-now"
+                onclick="buyNow()"
+            >
+                ⚡ Buy Now
+            </button>
+
+        </div>
+
+    </div>
 
 </div>
 
-<div class="right">
-
-<h1 id="productName"></h1>
-
-<p class="category" id="productCategory"></p>
-
-<h2 class="price" id="productPrice"></h2>
-
-<p class="description">
-
-Premium Quality Photo Frame.<br><br>
-
-✔ High Quality Finish<br>
-✔ Long Lasting Material<br>
-✔ Perfect for Home Decoration<br>
-✔ Best Gift Choice
-
-</p>
-
-<button class="cart" onclick="addToCart()">
-🛒 Add To Cart
-</button>
-
-<button class="buy" onclick="buyNow()">
-Buy Now
-</button>
-
-</div>
-
-</div>
 
 <script>
 
-const product = JSON.parse(localStorage.getItem("selectedProduct"));
+    /* =================================
+       GET SELECTED PRODUCT
+    ================================= */
 
-if(!product){
+    const selectedProduct =
+        JSON.parse(
+            localStorage.getItem(
+                "selectedProduct"
+            )
+        );
 
-    alert("No Product Selected");
 
-    window.location.href="products.html";
+    /* =================================
+       CHECK PRODUCT
+    ================================= */
 
-}
+    if (!selectedProduct) {
 
-document.getElementById("productImage").src=product.image;
-document.getElementById("productName").innerText=product.name;
-document.getElementById("productCategory").innerText="Category : "+(product.category || "Not Available");
-document.getElementById("productPrice").innerText="₹"+product.price;
+        alert(
+            "No Product Selected"
+        );
 
-function updateCartCount(){
-
-    const count=document.getElementById("cart-count");
-
-    if(count){
-
-        const cart=JSON.parse(localStorage.getItem("cart")) || [];
-
-        count.innerText=cart.length;
+        window.location.href =
+            "products.html";
 
     }
 
-}
 
-updateCartCount();
+    /* =================================
+       SHOW PRODUCT
+    ================================= */
 
-function addToCart(){
+    if (selectedProduct) {
 
-    let cart=JSON.parse(localStorage.getItem("cart")) || [];
+        const image =
+            document.getElementById(
+                "productImage"
+            );
 
-    const existing=cart.find(item=>item.id===product.id);
+        const name =
+            document.getElementById(
+                "productName"
+            );
 
-    if(existing){
+        const category =
+            document.getElementById(
+                "productCategory"
+            );
 
-        existing.quantity++;
+        const price =
+            document.getElementById(
+                "productPrice"
+            );
 
-    }else{
+        const container =
+            document.getElementById(
+                "productContainer"
+            );
 
-        cart.push({
+        const loading =
+            document.getElementById(
+                "loading"
+            );
 
-            ...product,
 
-            quantity:1
+        /* IMAGE */
+
+        image.src =
+            selectedProduct.image || "";
+
+
+        image.alt =
+            selectedProduct.name ||
+            "MP Frames";
+
+
+        image.onerror =
+            function () {
+
+                this.src =
+                    "https://via.placeholder.com/500x500?text=MP+Frames";
+
+            };
+
+
+        /* NAME */
+
+        name.innerText =
+            selectedProduct.name ||
+            "MP Frame";
+
+
+        /* CATEGORY */
+
+        category.innerText =
+            "Category: " +
+            (
+                selectedProduct.category ||
+                "Not Available"
+            );
+
+
+        /* PRICE */
+
+        price.innerText =
+            "₹" +
+            (
+                Number(
+                    selectedProduct.price
+                ) || 0
+            );
+
+
+        /* SHOW */
+
+        loading.style.display =
+            "none";
+
+        container.style.display =
+            "grid";
+
+    }
+
+
+    /* =================================
+       CART COUNT
+    ================================= */
+
+    function updateCartCount() {
+
+        const cartCount =
+            document.getElementById(
+                "cart-count"
+            );
+
+
+        const cart =
+            JSON.parse(
+                localStorage.getItem(
+                    "cart"
+                )
+            ) || [];
+
+
+        let totalQuantity = 0;
+
+
+        cart.forEach(item => {
+
+            totalQuantity +=
+                Number(
+                    item.quantity
+                ) || 1;
 
         });
 
+
+        cartCount.innerText =
+            totalQuantity;
+
     }
 
-    localStorage.setItem("cart",JSON.stringify(cart));
+
+    /* =================================
+       ADD TO CART
+    ================================= */
+
+    function addToCart() {
+
+        if (!selectedProduct) {
+            return;
+        }
+
+
+        let cart =
+            JSON.parse(
+                localStorage.getItem(
+                    "cart"
+                )
+            ) || [];
+
+
+        const existing =
+            cart.find(
+                item =>
+                    item.id ===
+                    selectedProduct.id
+            );
+
+
+        if (existing) {
+
+            existing.quantity =
+                (
+                    Number(
+                        existing.quantity
+                    ) || 1
+                ) + 1;
+
+        } else {
+
+            cart.push({
+
+                id:
+                    selectedProduct.id,
+
+                name:
+                    selectedProduct.name,
+
+                price:
+                    Number(
+                        selectedProduct.price
+                    ) || 0,
+
+                category:
+                    selectedProduct.category ||
+                    "",
+
+                image:
+                    selectedProduct.image ||
+                    "",
+
+                quantity: 1
+
+            });
+
+        }
+
+
+        localStorage.setItem(
+            "cart",
+            JSON.stringify(cart)
+        );
+
+
+        updateCartCount();
+
+
+        alert(
+            "Product Added To Cart!"
+        );
+
+    }
+
+
+    /* =================================
+       BUY NOW
+    ================================= */
+
+    function buyNow() {
+
+        if (!selectedProduct) {
+            return;
+        }
+
+
+        let cart =
+            JSON.parse(
+                localStorage.getItem(
+                    "cart"
+                )
+            ) || [];
+
+
+        const existing =
+            cart.find(
+                item =>
+                    item.id ===
+                    selectedProduct.id
+            );
+
+
+        if (existing) {
+
+            existing.quantity =
+                (
+                    Number(
+                        existing.quantity
+                    ) || 1
+                ) + 1;
+
+        } else {
+
+            cart.push({
+
+                id:
+                    selectedProduct.id,
+
+                name:
+                    selectedProduct.name,
+
+                price:
+                    Number(
+                        selectedProduct.price
+                    ) || 0,
+
+                category:
+                    selectedProduct.category ||
+                    "",
+
+                image:
+                    selectedProduct.image ||
+                    "",
+
+                quantity: 1
+
+            });
+
+        }
+
+
+        localStorage.setItem(
+            "cart",
+            JSON.stringify(cart)
+        );
+
+
+        window.location.href =
+            "checkout.html";
+
+    }
+
+
+    /* =================================
+       START
+    ================================= */
 
     updateCartCount();
 
-    alert("Product Added To Cart");
-
-}
-
-function buyNow(){
-
-    addToCart();
-
-    window.location.href="checkout.html";
-
-}
-
 </script>
 
+
 </body>
+
 </html>
