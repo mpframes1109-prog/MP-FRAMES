@@ -8,7 +8,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
 
-const table = document.getElementById("ordersTable");
+const tbody = document.getElementById("ordersBody");
 
 
 async function loadOrders() {
