@@ -1,91 +1,42 @@
-// Load existing products
-let products = JSON.parse(localStorage.getItem("products")) || [];
+import { app, db } from "./firebase.js";
 
-// Display products when page loads
-displayProducts();
+import {
+  collection,
+  addDoc,
+  getDocs,
+  deleteDoc,
+  doc
+} from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
-// Add Product
-function addProduct() {
+const productList = document.getElementById("product-list");
 
-    let name = document.getElementById("name").value.trim();
-    let price = document.getElementById("price").value.trim();
-    let image = document.getElementById("image").value.trim();
+// Load Products
+async function loadProducts() {
 
-    if (name === "" || price === "" || image === "") {
-        alert("Please fill all fields.");
-        return;
-    }
+    productList.innerHTML = "";
 
-    const product = {
-        id: Date.now(),
-        name: name,
-        price: Number(price),
-        image: image
-    };
+    const querySnapshot = await getDocs(collection(db, "products"));
 
-    products.push(product);
+    querySnapshot.forEach((document) => {
 
-    localStorage.setItem("products", JSON.stringify(products));
+        const product = document.data();
 
-    document.getElementById("name").value = "";
-    document.getElementById("price").value = "";
-    document.getElementById("image").value = "";
-
-    displayProducts();
-
-    alert("Product Added Successfully!");
-}
-
-// Display Products
-function displayProducts() {
-
-    const list = document.getElementById("product-list");
-
-    list.innerHTML = "";
-
-    if (products.length === 0) {
-        list.innerHTML = "<p>No Products Available</p>";
-        return;
-    }
-
-    products.forEach((product, index) => {
-
-        list.innerHTML += `
-        <div style="
-            background:#fff;
-            padding:15px;
-            border-radius:10px;
-            box-shadow:0 0 10px rgba(0,0,0,.1);
-            text-align:center;
-        ">
-            <img src="${product.image}"
-                 style="width:100%;height:180px;object-fit:cover;border-radius:8px;">
+        productList.innerHTML += `
+        <div class="card">
+            <img src="${product.image}" width="150">
 
             <h3>${product.name}</h3>
 
-            <p><strong>₹${product.price}</strong></p>
+            <p>₹${product.price}</p>
 
-            <button onclick="deleteProduct(${index})"
-            style="background:red;color:white;">
+            <button onclick="deleteProduct('${document.id}')">
             Delete
             </button>
+
         </div>
         `;
     });
 
 }
 
-// Delete Product
-function deleteProduct(index){
-
-    if(confirm("Delete this product?")){
-
-        products.splice(index,1);
-
-        localStorage.setItem("products",JSON.stringify(products));
-
-        displayProducts();
-
-    }
-
-}
+loadProducts();
