@@ -627,7 +627,7 @@ ${photoName}`;
 
                             window.open(
 
-                                "https://wa.me/6382667556?text=" +
+                                "https://wa.me/8220798492?text=" +
                                 encodeURIComponent(
                                     whatsapp
                                 ),
