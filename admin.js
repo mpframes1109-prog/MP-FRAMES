@@ -1,66 +1,91 @@
+// Load existing products
 let products = JSON.parse(localStorage.getItem("products")) || [];
 
+// Display products when page loads
+displayProducts();
+
+// Add Product
 function addProduct() {
 
-    const name = document.getElementById("name").value;
-    const price = document.getElementById("price").value;
-    const image = document.getElementById("image").value;
+    let name = document.getElementById("name").value.trim();
+    let price = document.getElementById("price").value.trim();
+    let image = document.getElementById("image").value.trim();
 
-    if (!name || !price || !image) {
-        alert("Fill all fields");
+    if (name === "" || price === "" || image === "") {
+        alert("Please fill all fields.");
         return;
     }
 
-    products.push({
+    const product = {
         id: Date.now(),
-        name,
-        price,
-        image
-    });
+        name: name,
+        price: Number(price),
+        image: image
+    };
+
+    products.push(product);
 
     localStorage.setItem("products", JSON.stringify(products));
-
-    displayProducts();
 
     document.getElementById("name").value = "";
     document.getElementById("price").value = "";
     document.getElementById("image").value = "";
+
+    displayProducts();
+
+    alert("Product Added Successfully!");
 }
 
+// Display Products
 function displayProducts() {
 
     const list = document.getElementById("product-list");
 
     list.innerHTML = "";
 
+    if (products.length === 0) {
+        list.innerHTML = "<p>No Products Available</p>";
+        return;
+    }
+
     products.forEach((product, index) => {
 
         list.innerHTML += `
-        <div style="border:1px solid #ddd;padding:15px;margin:15px;max-width:500px;">
-            <img src="${product.image}" width="100"><br><br>
+        <div style="
+            background:#fff;
+            padding:15px;
+            border-radius:10px;
+            box-shadow:0 0 10px rgba(0,0,0,.1);
+            text-align:center;
+        ">
+            <img src="${product.image}"
+                 style="width:100%;height:180px;object-fit:cover;border-radius:8px;">
 
-            <b>${product.name}</b><br>
+            <h3>${product.name}</h3>
 
-            ₹${product.price}<br><br>
+            <p><strong>₹${product.price}</strong></p>
 
-            <button onclick="deleteProduct(${index})">
+            <button onclick="deleteProduct(${index})"
+            style="background:red;color:white;">
             Delete
             </button>
         </div>
         `;
-
     });
 
 }
 
+// Delete Product
 function deleteProduct(index){
 
-    products.splice(index,1);
+    if(confirm("Delete this product?")){
 
-    localStorage.setItem("products", JSON.stringify(products));
+        products.splice(index,1);
 
-    displayProducts();
+        localStorage.setItem("products",JSON.stringify(products));
+
+        displayProducts();
+
+    }
 
 }
-
-displayProducts();
