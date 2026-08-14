@@ -1,298 +1,66 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>MP Frames - Cart</title>
-
-<link rel="stylesheet" href="style.css">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-
-<style>
-
-body{
-    margin:0;
-    font-family:Arial,sans-serif;
-    background:#f5f5f5;
-}
-
-header{
-    background:#111;
-    color:#fff;
-    padding:15px 30px;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-}
-
-header h2{
-    margin:0;
-}
-
-header nav a{
-    color:#fff;
-    text-decoration:none;
-    margin-left:20px;
-}
-
-header nav a:hover{
-    color:gold;
-}
-
-.container{
-    width:90%;
-    max-width:1000px;
-    margin:40px auto;
-}
-
-.cart-item{
-    display:flex;
-    gap:20px;
-    align-items:center;
-    background:#fff;
-    padding:20px;
-    border-radius:10px;
-    margin-bottom:20px;
-    box-shadow:0 5px 10px rgba(0,0,0,.1);
-}
-
-.cart-item img{
-    width:150px;
-    height:150px;
-    object-fit:cover;
-    border-radius:10px;
-}
-
-.cart-info{
-    flex:1;
-}
-
-.cart-info h3{
-    margin:0;
-}
-
-.cart-info p{
-    margin:8px 0;
-}
-
-button{
-    padding:8px 15px;
-    border:none;
-    border-radius:6px;
-    cursor:pointer;
-}
-
-.qty{
-    background:#2196F3;
-    color:white;
-}
-
-.remove{
-    background:#e53935;
-    color:white;
-}
-
-.checkout{
-    margin-top:30px;
-    text-align:right;
-}
-
-.checkout h2{
-    margin-bottom:20px;
-}
-
-.checkout button{
-    background:#111;
-    color:white;
-    padding:15px 25px;
-    font-size:18px;
-}
-
-.checkout button:hover{
-    background:gold;
-    color:black;
-}
-
-.empty{
-    text-align:center;
-    font-size:25px;
-    margin-top:60px;
-}
-
-</style>
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MP Frames - Cart</title>
+    <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
 
 <header>
-
-<h2>MP Frames</h2>
-
-<nav>
-
-<a href="index.html">Home</a>
-
-<a href="products.html">Products</a>
-
-<a href="cart.html">
-<i class="fa-solid fa-cart-shopping"></i>
-</a>
-
-</nav>
-
+    <h2>🛒 Your Cart</h2>
+    <a href="index.html">⬅ Back to Shop</a>
 </header>
 
-<div class="container">
+<section style="padding:30px;">
+    <div id="cart-items"></div>
 
-<div id="cart-items"></div>
+    <h2>Total: ₹<span id="total">0</span></h2>
 
-<div class="checkout">
+    <br>
 
-<h2>Total : ₹<span id="total">0</span></h2>
+    <a href="checkout.html">
+        <button>Proceed to Checkout</button>
+    </a>
+</section>
 
-<button onclick="checkout()">
-Proceed To Checkout
+<script>
+let cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+let cartItems = document.getElementById("cart-items");
+let total = 0;
+
+cart.forEach((item,index)=>{
+
+total += item.price;
+
+cartItems.innerHTML += `
+<div style="border:1px solid #ddd;padding:15px;margin:15px 0;border-radius:10px;">
+<img src="${item.image}" width="120">
+<h3>${item.name}</h3>
+<p>₹${item.price}</p>
+
+<button onclick="removeItem(${index})">
+Remove
 </button>
 
 </div>
+`;
 
-</div>
+});
 
-<script>
-
-let cart = JSON.parse(localStorage.getItem("cart")) || [];
-
-const cartItems = document.getElementById("cart-items");
-
-let total = 0;
-
-function loadCart(){
-
-    cartItems.innerHTML="";
-
-    total=0;
-
-    if(cart.length===0){
-
-        cartItems.innerHTML="<h2 class='empty'>🛒 Your Cart is Empty</h2>";
-
-        document.getElementById("total").innerText="0";
-
-        return;
-
-    }
-
-    cart.forEach((item,index)=>{
-
-        if(!item.quantity){
-
-            item.quantity=1;
-
-        }
-
-        total+=item.price*item.quantity;
-
-        cartItems.innerHTML+=`
-
-        <div class="cart-item">
-
-            <img src="${item.image}">
-
-            <div class="cart-info">
-
-                <h3>${item.name}</h3>
-
-                <p><b>Category:</b> ${item.category || "Not Available"}</p>
-
-                <p><b>Price:</b> ₹${item.price}</p>
-
-                <p>
-
-                    <button class="qty"
-                    onclick="changeQty(${index},-1)">-</button>
-
-                    <b style="padding:0 10px;">
-                    ${item.quantity}
-                    </b>
-
-                    <button class="qty"
-                    onclick="changeQty(${index},1)">+</button>
-
-                </p>
-
-                <p>
-
-                <b>Subtotal :</b>
-
-                ₹${item.price*item.quantity}
-
-                </p>
-
-                <button class="remove"
-                onclick="removeItem(${index})">
-
-                Remove
-
-                </button>
-
-            </div>
-
-        </div>
-
-        `;
-
-    });
-
-    document.getElementById("total").innerText=total;
-
-    localStorage.setItem("cart",JSON.stringify(cart));
-
-}
-
-function changeQty(index,value){
-
-    cart[index].quantity+=value;
-
-    if(cart[index].quantity<1){
-
-        cart[index].quantity=1;
-
-    }
-
-    loadCart();
-
-}
+document.getElementById("total").innerText = total;
 
 function removeItem(index){
 
-    if(confirm("Remove this product from cart?")){
+cart.splice(index,1);
 
-        cart.splice(index,1);
+localStorage.setItem("cart",JSON.stringify(cart));
 
-        loadCart();
-
-    }
+location.reload();
 
 }
-
-function checkout(){
-
-    if(cart.length===0){
-
-        alert("Your cart is empty");
-
-        return;
-
-    }
-
-    window.location.href="checkout.html";
-
-}
-
-loadCart();
-
 </script>
 
 </body>
