@@ -1,67 +1,331 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MP Frames</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<link rel="stylesheet" href="style.css">
+    <title>MP Frames</title>
 
-<link rel="stylesheet"
-href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
 
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+            color: #111;
+        }
+
+        header {
+            background: #111;
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+
+        .logo {
+            font-size: 26px;
+            font-weight: bold;
+        }
+
+        nav {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        nav a:hover {
+            color: #25D366;
+        }
+
+        .cart-link {
+            position: relative;
+        }
+
+        #cartCount {
+            background: #25D366;
+            color: white;
+            border-radius: 50%;
+            padding: 3px 7px;
+            font-size: 12px;
+            position: absolute;
+            top: -12px;
+            right: -15px;
+        }
+
+        .hero {
+            text-align: center;
+            padding: 55px 20px;
+            background: white;
+        }
+
+        .hero h1 {
+            font-size: 42px;
+            margin: 0 0 10px;
+        }
+
+        .hero p {
+            color: #666;
+            font-size: 18px;
+        }
+
+        .products-section {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .products-section h2 {
+            text-align: center;
+            font-size: 30px;
+            margin-bottom: 30px;
+        }
+
+        #product-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+            gap: 25px;
+        }
+
+        .product-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.10);
+            transition: 0.2s;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .product-card img {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .product-info {
+            padding: 18px;
+        }
+
+        .product-info h3 {
+            margin: 0 0 8px;
+            font-size: 20px;
+        }
+
+        .category {
+            color: #777;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .price {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .product-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .product-buttons button {
+            flex: 1;
+            padding: 11px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .view-btn {
+            background: #111;
+            color: white;
+        }
+
+        .cart-btn {
+            background: #25D366;
+            color: white;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            font-size: 18px;
+        }
+
+        .error {
+            text-align: center;
+            color: red;
+            padding: 30px;
+        }
+
+        footer {
+            background: #111;
+            color: white;
+            text-align: center;
+            padding: 25px;
+            margin-top: 50px;
+        }
+
+        @media(max-width:700px) {
+
+            header {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            nav {
+                gap: 12px;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .hero h1 {
+                font-size: 32px;
+            }
+
+            .product-card img {
+                height: 220px;
+            }
+        }
+    </style>
 </head>
+
 <body>
 
-<header>
+    <!-- HEADER -->
 
-<div class="logo">
-<h2>MP Frames</h2>
-</div>
+    <header>
 
-<nav>
-<a href="#">Home</a>
-<a href="#products">Products</a>
-<a href="#">About</a>
-<a href="#">Contact</a>
-<a href="cart.html">
-<i class="fa-solid fa-cart-shopping"></i>
-<span id="cart-count">0</span>
-</a>
-</nav>
+        <div class="logo">
+            MP Frames
+        </div>
 
-</header>
+        <nav>
 
-<section class="hero">
+            <a href="index.html">
+                Home
+            </a>
 
-<h1>Frame Your Beautiful Memories</h1>
+            <a href="products.html">
+                Products
+            </a>
 
-<p>Premium Quality Photo Frames at Affordable Prices.</p>
+            <a href="about.html">
+                About
+            </a>
 
-<a href="#products">
-<button>Shop Now</button>
-</a>
+            <a href="contact.html">
+                Contact
+            </a>
 
-</section>
+            <a href="cart.html" class="cart-link">
+                Cart
+                <span id="cartCount">0</span>
+            </a>
 
-<section id="products">
+            <a href="login.html">
+                Admin
+            </a>
 
-<h2>Featured Frames</h2>
+        </nav>
 
-<div class="product-container" id="product-container">
+    </header>
 
-</div>
 
-</section>
+    <!-- HERO -->
 
-<footer>
+    <section class="hero">
 
-<p>© 2026 MP Frames. All Rights Reserved.</p>
+        <h1>
+            Premium Photo Frames
+        </h1>
 
-</footer>
+        <p>
+            Turn your memories into beautiful frames.
+        </p>
 
-<script src="products.js"></script>
-<script src="script.js"></script>
+    </section>
+
+
+    <!-- PRODUCTS -->
+
+    <section class="products-section">
+
+        <h2>
+            Our Products
+        </h2>
+
+        <div id="product-container">
+
+            <div class="loading">
+                Loading products...
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- FOOTER -->
+
+    <footer>
+
+        <p>
+            © 2026 MP Frames. All Rights Reserved.
+        </p>
+
+    </footer>
+
+
+    <!-- FIREBASE / PRODUCTS -->
+
+    <script type="module" src="products.js"></script>
+
+    <script>
+
+        function updateCartCount() {
+
+            const cart =
+                JSON.parse(localStorage.getItem("cart")) || [];
+
+            let count = 0;
+
+            cart.forEach(item => {
+
+                count += Number(item.quantity || 1);
+
+            });
+
+            const cartCount =
+                document.getElementById("cartCount");
+
+            if (cartCount) {
+
+                cartCount.innerText = count;
+
+            }
+
+        }
+
+        updateCartCount();
+
+    </script>
 
 </body>
+
 </html>
