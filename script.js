@@ -1,26 +1,33 @@
-// Display products on home page
+// Load products
 const productContainer = document.getElementById("product-container");
 
-if(productContainer){
+if (productContainer) {
     products.forEach(product => {
+
         productContainer.innerHTML += `
-            <div class="product">
-                <img src="${product.image}" alt="${product.name}">
-                <div class="product-content">
-                    <h3>${product.name}</h3>
-                    <p class="price">₹${product.price}</p>
-                    <button onclick="addToCart(${product.id})">Add to Cart</button>
-                </div>
+        <div class="product">
+            <img src="${product.image}" alt="${product.name}">
+            <div class="product-content">
+                <h3>${product.name}</h3>
+                <p class="price">₹${product.price}</p>
+
+                <button onclick="addToCart(${product.id})">
+                    Add To Cart
+                </button>
             </div>
+        </div>
         `;
+
     });
 }
 
-// Add product to cart
-function addToCart(id){
-    let cart = JSON.parse(localStorage.getItem("cart")) || [];
+// Get Cart
+let cart = JSON.parse(localStorage.getItem("cart")) || [];
 
-    const product = products.find(p => p.id === id);
+// Add To Cart
+function addToCart(id){
+
+    const product = products.find(item => item.id === id);
 
     cart.push(product);
 
@@ -28,17 +35,18 @@ function addToCart(id){
 
     updateCartCount();
 
-    alert(product.name + " added to cart!");
+    alert("Product Added To Cart");
 }
 
-// Update cart count
+// Cart Count
 function updateCartCount(){
-    let cart = JSON.parse(localStorage.getItem("cart")) || [];
-    const countElement = document.getElementById("cart-count");
 
-    if(countElement){
-        countElement.innerText = cart.length;
+    const count = document.getElementById("cart-count");
+
+    if(count){
+        count.innerText = cart.length;
     }
+
 }
 
 updateCartCount();
