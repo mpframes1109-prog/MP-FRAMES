@@ -1,71 +1,57 @@
-import { app, db, storage } from "./firebase.js";
-
-import {
-    getAuth,
-    onAuthStateChanged,
-    signOut
-} from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+import { db, auth } from "./firebase.js";
 
 import {
     collection,
-    addDoc,
     getDocs,
+    addDoc,
     deleteDoc,
+    updateDoc,
     doc
 } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
 import {
-    ref,
-    uploadBytes,
-    getDownloadURL
-} from "https://www.gstatic.com/firebasejs/12.0.0/firebase-storage.js";
+    onAuthStateChanged,
+    signOut
+} from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
 
 
-const auth = getAuth(app);
-
-const productList =
-    document.getElementById("product-list");
-
-const productCount =
-    document.getElementById("productCount");
+const ADMIN_UID =
+    "6LssLKjKdpZFkIXbz9MfEZFqTGv1";
 
 
 // ======================================
-// ADMIN LOGIN CHECK
+// AUTH CHECK
 // ======================================
 
-onAuthStateChanged(auth, (user) => {
+onAuthStateChanged(auth, async (user) => {
+
+    console.log("Admin auth:", user);
 
     if (!user) {
 
         window.location.href = "login.html";
 
+        return;
     }
 
-});
 
+    if (user.uid !== ADMIN_UID) {
 
-// ======================================
-// LOGOUT
-// ======================================
-
-window.logout = async function () {
-
-    try {
+        alert("You are not authorized as admin.");
 
         await signOut(auth);
 
         window.location.href = "login.html";
 
-    } catch (error) {
-
-        console.error("Logout error:", error);
-
-        alert("Logout failed");
-
+        return;
     }
 
-};
+
+    console.log("✅ Admin logged in");
+
+    loadProducts();
+
+});
 
 
 // ======================================
@@ -74,85 +60,79 @@ window.logout = async function () {
 
 window.addProduct = async function () {
 
-    const name =
-        document.getElementById("name")
-            .value
-            .trim();
+    const nameInput =
+        document.getElementById("productName");
 
-    const price =
-        document.getElementById("price")
-            .value
-            .trim();
+    const priceInput =
+        document.getElementById("productPrice");
 
-    const category =
-        document.getElementById("category")
-            .value
-            .trim();
+    const categoryInput =
+        document.getElementById("productCategory");
 
     const imageInput =
-        document.getElementById("image");
+        document.getElementById("productImage");
 
 
-    // -------------------------------
-    // VALIDATION
-    // -------------------------------
+    const name =
+        nameInput?.value.trim();
 
-    if (!name || !price || !category) {
+    const price =
+        Number(priceInput?.value);
 
-        alert("Please fill all product details");
+    const category =
+        categoryInput?.value.trim();
+
+
+    if (!name) {
+
+        alert("Enter product name.");
 
         return;
-
     }
 
 
-    if (
-        !imageInput ||
-        !imageInput.files ||
-        imageInput.files.length === 0
-    ) {
+    if (!price || price <= 0) {
 
-        alert("Please select a product image");
+        alert("Enter valid product price.");
 
         return;
-
     }
 
 
-    const imageFile =
-        imageInput.files[0];
+    if (!category) {
 
-
-    // -------------------------------
-    // IMAGE TYPE
-    // -------------------------------
-
-    if (!imageFile.type.startsWith("image/")) {
-
-        alert("Please select a valid image");
+        alert("Enter product category.");
 
         return;
-
     }
 
 
-    // -------------------------------
-    // IMAGE SIZE
-    // -------------------------------
+    const file =
+        imageInput?.files?.[0];
 
-    if (imageFile.size > 5 * 1024 * 1024) {
 
-        alert("Image must be less than 5 MB");
+    if (!file) {
+
+        alert("Please select product image.");
 
         return;
+    }
 
+
+    if (!file.type.startsWith("image/")) {
+
+        alert("Please select an image file.");
+
+        return;
     }
 
 
     try {
 
         const button =
-            document.querySelector(".add-btn");
+            document.querySelector(
+                ".add-product-btn"
+            );
 
 
         if (button) {
@@ -161,47 +141,21 @@ window.addProduct = async function () {
 
             button.innerText =
                 "Uploading...";
-
         }
 
 
-        // -------------------------------
-        // UNIQUE IMAGE NAME
-        // -------------------------------
+        /*
+         IMPORTANT
 
-        const fileName =
-            `products/${Date.now()}_${imageFile.name}`;
+         Firebase Storage is NOT used here.
 
+         We convert the image to Base64
+         and store it directly inside Firestore.
+        */
 
-        // -------------------------------
-        // STORAGE REFERENCE
-        // -------------------------------
+        const imageBase64 =
+            await fileToBase64(file);
 
-        const imageRef =
-            ref(storage, fileName);
-
-
-        // -------------------------------
-        // UPLOAD IMAGE
-        // -------------------------------
-
-        await uploadBytes(
-            imageRef,
-            imageFile
-        );
-
-
-        // -------------------------------
-        // GET IMAGE URL
-        // -------------------------------
-
-        const imageURL =
-            await getDownloadURL(imageRef);
-
-
-        // -------------------------------
-        // SAVE PRODUCT
-        // -------------------------------
 
         await addDoc(
             collection(db, "products"),
@@ -209,60 +163,59 @@ window.addProduct = async function () {
 
                 name: name,
 
-                price: Number(price),
+                price: price,
 
                 category: category,
 
-                image: imageURL,
+                image: imageBase64,
 
-                createdAt: new Date()
+                createdAt:
+                    new Date()
 
             }
         );
 
 
-        // -------------------------------
-        // CLEAR FORM
-        // -------------------------------
-
-        document.getElementById("name")
-            .value = "";
-
-        document.getElementById("price")
-            .value = "";
-
-        document.getElementById("category")
-            .value = "";
-
-        imageInput.value = "";
-
-
         alert(
-            "Product Added Successfully!"
+            "Product added successfully!"
         );
 
 
-        await loadProducts();
+        if (nameInput)
+            nameInput.value = "";
+
+        if (priceInput)
+            priceInput.value = "";
+
+        if (categoryInput)
+            categoryInput.value = "";
+
+        if (imageInput)
+            imageInput.value = "";
+
+
+        loadProducts();
 
 
     } catch (error) {
 
         console.error(
-            "Add product error:",
+            "ADD PRODUCT ERROR:",
             error
         );
 
 
         alert(
-            "Product upload failed!\n\n" +
+            "Failed to add product:\n\n" +
             error.message
         );
-
 
     } finally {
 
         const button =
-            document.querySelector(".add-btn");
+            document.querySelector(
+                ".add-product-btn"
+            );
 
 
         if (button) {
@@ -271,7 +224,6 @@ window.addProduct = async function () {
 
             button.innerText =
                 "Add Product";
-
         }
 
     }
@@ -285,108 +237,299 @@ window.addProduct = async function () {
 
 async function loadProducts() {
 
+    const container =
+        document.getElementById(
+            "productsList"
+        );
+
+
+    console.log(
+        "loadProducts() started"
+    );
+
+
+    if (!container) {
+
+        console.error(
+            "❌ productsList element not found"
+        );
+
+        return;
+    }
+
+
+    container.innerHTML = `
+        <div
+            style="
+                text-align:center;
+                padding:30px;
+                color:#777;
+            "
+        >
+            Loading products...
+        </div>
+    `;
+
+
     try {
 
-        productList.innerHTML = `
-            <div class="empty-products">
-                Loading products...
-            </div>
-        `;
+        console.log(
+            "Reading products collection..."
+        );
 
 
         const snapshot =
             await getDocs(
-                collection(db, "products")
+                collection(
+                    db,
+                    "products"
+                )
             );
 
 
-        productList.innerHTML = "";
-
-
-        if (productCount) {
-
-            productCount.innerText =
-                snapshot.size;
-
-        }
+        console.log(
+            "Products found:",
+            snapshot.size
+        );
 
 
         if (snapshot.empty) {
 
-            productList.innerHTML = `
-                <div class="empty-products">
-                    No Products Found
+            container.innerHTML = `
+                <div
+                    style="
+                        text-align:center;
+                        padding:30px;
+                        color:#777;
+                    "
+                >
+                    No products found.
                 </div>
             `;
 
             return;
-
         }
 
 
-        snapshot.forEach((item) => {
-
-            const product =
-                item.data();
+        container.innerHTML = "";
 
 
-            productList.innerHTML += `
+        snapshot.forEach(
+            (productDoc) => {
 
-                <div class="product-card">
+                const product =
+                    productDoc.data();
 
-                    <img
-                        src="${product.image || ""}"
-                        alt="${product.name || "Product"}"
+
+                const productId =
+                    productDoc.id;
+
+
+                const card =
+                    document.createElement(
+                        "div"
+                    );
+
+
+                card.style.cssText = `
+                    background:#fff;
+                    border-radius:10px;
+                    padding:18px;
+                    margin-bottom:15px;
+                    box-shadow:0 3px 12px rgba(0,0,0,.08);
+                `;
+
+
+                const image =
+                    product.image || "";
+
+
+                card.innerHTML = `
+
+                    <div
+                        style="
+                            display:flex;
+                            gap:20px;
+                            align-items:center;
+                            flex-wrap:wrap;
+                        "
                     >
 
-                    <div class="product-info">
+                        ${
+                            image
+                            ?
+                            `
+                            <img
+                                src="${escapeHTML(image)}"
+                                alt="${escapeHTML(
+                                    product.name || "Product"
+                                )}"
+                                style="
+                                    width:120px;
+                                    height:120px;
+                                    object-fit:cover;
+                                    border-radius:8px;
+                                    border:1px solid #ddd;
+                                "
+                                onerror="
+                                    this.style.display='none';
+                                "
+                            >
+                            `
+                            :
+                            `
+                            <div
+                                style="
+                                    width:120px;
+                                    height:120px;
+                                    display:flex;
+                                    align-items:center;
+                                    justify-content:center;
+                                    background:#eee;
+                                    border-radius:8px;
+                                    color:#777;
+                                "
+                            >
+                                No Image
+                            </div>
+                            `
+                        }
 
-                        <h3>
-                            ${product.name || ""}
-                        </h3>
 
-                        <p>
-                            Category:
-                            ${product.category || ""}
-                        </p>
+                        <div
+                            style="
+                                flex:1;
+                                min-width:200px;
+                            "
+                        >
 
-                        <div class="product-price">
-                            ₹${Number(product.price || 0)}
+                            <h3
+                                style="
+                                    margin:0 0 8px;
+                                "
+                            >
+                                ${escapeHTML(
+                                    product.name || "-"
+                                )}
+                            </h3>
+
+
+                            <p>
+                                <strong>
+                                    Price:
+                                </strong>
+
+                                ₹${Number(
+                                    product.price || 0
+                                ).toFixed(2)}
+                            </p>
+
+
+                            <p>
+                                <strong>
+                                    Category:
+                                </strong>
+
+                                ${escapeHTML(
+                                    product.category || "-"
+                                )}
+                            </p>
+
                         </div>
 
-                        <button
-                            class="delete-btn"
-                            onclick="deleteProduct('${item.id}')"
-                        >
-                            Delete
-                        </button>
+
+                        <div>
+
+                            <button
+                                type="button"
+                                onclick="editProduct('${productId}')"
+                                style="
+                                    background:#007bff;
+                                    color:white;
+                                    border:none;
+                                    padding:9px 14px;
+                                    border-radius:6px;
+                                    cursor:pointer;
+                                    margin-right:6px;
+                                "
+                            >
+                                Edit
+                            </button>
+
+
+                            <button
+                                type="button"
+                                onclick="deleteProduct('${productId}')"
+                                style="
+                                    background:#dc3545;
+                                    color:white;
+                                    border:none;
+                                    padding:9px 14px;
+                                    border-radius:6px;
+                                    cursor:pointer;
+                                "
+                            >
+                                Delete
+                            </button>
+
+                        </div>
 
                     </div>
 
-                </div>
+                `;
 
-            `;
 
-        });
+                container.appendChild(
+                    card
+                );
+
+            }
+        );
 
 
     } catch (error) {
 
         console.error(
-            "Load products error:",
+            "❌ LOAD PRODUCTS ERROR:",
             error
         );
 
 
-        productList.innerHTML = `
+        container.innerHTML = `
 
-            <div class="empty-products">
+            <div
+                style="
+                    color:red;
+                    text-align:center;
+                    padding:30px;
+                "
+            >
 
-                ❌ Failed to load products
+                <strong>
+                    ❌ Unable to load products
+                </strong>
 
                 <br><br>
 
-                ${error.message}
+                ${escapeHTML(
+                    error.message
+                )}
+
+                <br><br>
+
+                <button
+                    onclick="loadProducts()"
+                    style="
+                        background:#111;
+                        color:white;
+                        border:none;
+                        padding:10px 18px;
+                        border-radius:6px;
+                        cursor:pointer;
+                    "
+                >
+                    Retry
+                </button>
 
             </div>
 
@@ -401,56 +544,279 @@ async function loadProducts() {
 // DELETE PRODUCT
 // ======================================
 
-window.deleteProduct = async function (id) {
+window.deleteProduct =
+    async function(productId) {
 
-    const confirmDelete =
-        confirm(
-            "Are you sure you want to delete this product?"
-        );
+        const confirmDelete =
+            confirm(
+                "Are you sure you want to delete this product?"
+            );
 
 
-    if (!confirmDelete) {
+        if (!confirmDelete) {
 
-        return;
+            return;
+        }
+
+
+        try {
+
+            await deleteDoc(
+                doc(
+                    db,
+                    "products",
+                    productId
+                )
+            );
+
+
+            alert(
+                "Product deleted successfully."
+            );
+
+
+            loadProducts();
+
+
+        } catch (error) {
+
+            console.error(
+                "Delete product error:",
+                error
+            );
+
+
+            alert(
+                "Delete failed:\n\n" +
+                error.message
+            );
+
+        }
+
+    };
+
+
+// ======================================
+// EDIT PRODUCT
+// ======================================
+
+window.editProduct =
+    async function(productId) {
+
+        const newName =
+            prompt(
+                "Enter new product name:"
+            );
+
+
+        if (newName === null) {
+
+            return;
+        }
+
+
+        const newPrice =
+            prompt(
+                "Enter new product price:"
+            );
+
+
+        if (newPrice === null) {
+
+            return;
+        }
+
+
+        const newCategory =
+            prompt(
+                "Enter new category:"
+            );
+
+
+        if (newCategory === null) {
+
+            return;
+        }
+
+
+        const price =
+            Number(newPrice);
+
+
+        if (
+            !newName.trim() ||
+            !price ||
+            price <= 0 ||
+            !newCategory.trim()
+        ) {
+
+            alert(
+                "Invalid product details."
+            );
+
+            return;
+        }
+
+
+        try {
+
+            await updateDoc(
+                doc(
+                    db,
+                    "products",
+                    productId
+                ),
+                {
+
+                    name:
+                        newName.trim(),
+
+                    price:
+                        price,
+
+                    category:
+                        newCategory.trim()
+
+                }
+            );
+
+
+            alert(
+                "Product updated successfully."
+            );
+
+
+            loadProducts();
+
+
+        } catch (error) {
+
+            console.error(
+                "Edit product error:",
+                error
+            );
+
+
+            alert(
+                "Update failed:\n\n" +
+                error.message
+            );
+
+        }
+
+    };
+
+
+// ======================================
+// LOGOUT
+// ======================================
+
+window.logoutAdmin =
+    async function() {
+
+        try {
+
+            await signOut(auth);
+
+            window.location.href =
+                "login.html";
+
+        } catch (error) {
+
+            console.error(
+                "Logout error:",
+                error
+            );
+
+
+            alert(
+                "Logout failed:\n\n" +
+                error.message
+            );
+
+        }
+
+    };
+
+
+// ======================================
+// FILE → BASE64
+// ======================================
+
+function fileToBase64(file) {
+
+    return new Promise(
+        (resolve, reject) => {
+
+            const reader =
+                new FileReader();
+
+
+            reader.onload =
+                () => resolve(
+                    reader.result
+                );
+
+
+            reader.onerror =
+                () => reject(
+                    new Error(
+                        "Failed to read image."
+                    )
+                );
+
+
+            reader.readAsDataURL(
+                file
+            );
+
+        }
+    );
+
+}
+
+
+// ======================================
+// ESCAPE HTML
+// ======================================
+
+function escapeHTML(value) {
+
+    if (
+        value === null ||
+        value === undefined
+    ) {
+
+        return "";
 
     }
 
 
-    try {
+    return String(value)
 
-        await deleteDoc(
-            doc(db, "products", id)
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+
+        .replace(
+            /</g,
+            "&lt;"
+        )
+
+        .replace(
+            />/g,
+            "&gt;"
+        )
+
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+
+        .replace(
+            /'/g,
+            "&#039;"
         );
 
-
-        alert(
-            "Product deleted successfully!"
-        );
-
-
-        await loadProducts();
-
-
-    } catch (error) {
-
-        console.error(
-            "Delete product error:",
-            error
-        );
-
-
-        alert(
-            "Delete failed!\n\n" +
-            error.message
-        );
-
-    }
-
-};
-
-
-// ======================================
-// START
-// ======================================
-
-loadProducts();
+}
