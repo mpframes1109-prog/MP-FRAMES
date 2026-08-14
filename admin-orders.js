@@ -11,32 +11,15 @@ import {
 const table = document.getElementById("ordersTable");
 
 
-// ===============================
-// LOAD ORDERS
-// ===============================
-
 async function loadOrders() {
-
-    if (!table) return;
-
-    table.innerHTML = `
-        <tr>
-            <td colspan="11">
-                Loading orders...
-            </td>
-        </tr>
-    `;
-
 
     try {
 
-        const snapshot =
-            await getDocs(
-                collection(db, "orders")
-            );
-
-
         table.innerHTML = "";
+
+        const snapshot = await getDocs(
+            collection(db, "orders")
+        );
 
 
         if (snapshot.empty) {
@@ -44,7 +27,7 @@ async function loadOrders() {
             table.innerHTML = `
                 <tr>
                     <td colspan="11">
-                        No orders found
+                        No Orders Found
                     </td>
                 </tr>
             `;
@@ -60,11 +43,57 @@ async function loadOrders() {
             const id = document.id;
 
 
-            // ===============================
-            // PHOTO
-            // ===============================
+            // Payment status
+            const paymentStatus =
+                order.paymentStatus ||
+                order.status ||
+                "Not Paid";
 
-            let photoHTML = "No Photo";
+
+            // Order status
+            const orderStatus =
+                order.orderStatus ||
+                "Pending";
+
+
+            // Date
+            let orderDate = "";
+
+            if (order.createdAt) {
+
+                try {
+
+                    if (order.createdAt.toDate) {
+
+                        orderDate =
+                            order.createdAt
+                                .toDate()
+                                .toLocaleString();
+
+                    } else {
+
+                        orderDate =
+                            new Date(
+                                order.createdAt
+                            ).toLocaleString();
+
+                    }
+
+                } catch (e) {
+
+                    orderDate = "";
+
+                }
+
+            }
+
+
+            // Photo
+            let photoHTML = `
+                <span class="no-photo">
+                    No Photo
+                </span>
+            `;
 
 
             if (order.photo) {
@@ -73,52 +102,26 @@ async function loadOrders() {
 
                     <img
                         src="${order.photo}"
-                        width="90"
-                        height="90"
-                        style="
-                            object-fit:cover;
-                            border-radius:8px;
-                            display:block;
-                            margin:auto;
-                        "
+                        class="order-photo"
+                        alt="Customer Photo"
                     >
 
-                    <div style="
-                        margin-top:8px;
-                        display:flex;
-                        gap:5px;
-                        justify-content:center;
-                        flex-direction:column;
-                    ">
+                    <div class="photo-buttons">
 
                         <a
                             href="${order.photo}"
                             target="_blank"
-                            style="
-                                background:#25D366;
-                                color:white;
-                                padding:8px;
-                                text-decoration:none;
-                                border-radius:5px;
-                            "
+                            class="view-btn"
                         >
                             🔍 View
                         </a>
 
-
                         <a
                             href="${order.photo}"
-                            target="_blank"
                             download
-                            style="
-                                background:#2196F3;
-                                color:white;
-                                padding:8px;
-                                text-decoration:none;
-                                border-radius:5px;
-                            "
+                            class="download-btn"
                         >
-                            ⬇️ Download
+                            ⬇ Download
                         </a>
 
                     </div>
@@ -128,151 +131,73 @@ async function loadOrders() {
             }
 
 
-            // ===============================
-            // PAYMENT STATUS
-            // ===============================
-
-            const paymentStatus =
-                order.paymentStatus || "Not Paid";
-
-
-            let paymentColor = "#dc3545";
-
+            // Payment display
+            let paymentHTML = "";
 
             if (
-                paymentStatus === "Paid"
+                paymentStatus.toLowerCase() === "paid"
             ) {
 
-                paymentColor = "#198754";
+                paymentHTML = `
+                    <span class="paid">
+                        ✅ Paid
+                    </span>
+                `;
+
+            } else {
+
+                paymentHTML = `
+                    <span class="not-paid">
+                        ❌ Not Paid
+                    </span>
+                `;
 
             }
 
-
-            // ===============================
-            // CREATED DATE
-            // ===============================
-
-            let createdDate = "";
-
-
-            if (order.createdAt) {
-
-                try {
-
-                    if (
-                        typeof order.createdAt.toDate ===
-                        "function"
-                    ) {
-
-                        createdDate =
-                            order.createdAt
-                                .toDate()
-                                .toLocaleString();
-
-                    }
-                    else {
-
-                        createdDate =
-                            new Date(
-                                order.createdAt
-                            ).toLocaleString();
-
-                    }
-
-                }
-                catch {
-
-                    createdDate = "";
-
-                }
-
-            }
-
-
-            // ===============================
-            // TABLE ROW
-            // ===============================
 
             table.innerHTML += `
 
                 <tr>
-
-                    <!-- NAME -->
 
                     <td>
                         ${order.customerName || ""}
                     </td>
 
 
-                    <!-- PHONE -->
-
                     <td>
                         ${order.phone || ""}
                     </td>
 
-
-                    <!-- ADDRESS -->
 
                     <td>
                         ${order.address || ""}
                     </td>
 
 
-                    <!-- FRAME -->
-
                     <td>
                         ${order.frameName || ""}
                     </td>
 
-
-                    <!-- QUANTITY -->
 
                     <td>
                         ${order.quantity || 1}
                     </td>
 
 
-                    <!-- PRICE -->
-
                     <td>
                         ₹${order.price || 0}
                     </td>
 
-
-                    <!-- PHOTO -->
 
                     <td>
                         ${photoHTML}
                     </td>
 
 
-                    <!-- PAYMENT -->
-
                     <td>
-
-                        <b style="
-                            color:${paymentColor};
-                        ">
-                            ${paymentStatus}
-                        </b>
-
-                        ${
-                            order.paymentId
-                            ? `
-                                <br>
-
-                                <small>
-                                    ID:
-                                    ${order.paymentId}
-                                </small>
-                              `
-                            : ""
-                        }
-
+                        ${paymentHTML}
                     </td>
 
-
-                    <!-- ORDER STATUS -->
 
                     <td>
 
@@ -282,53 +207,29 @@ async function loadOrders() {
 
                             <option
                                 value="Pending"
-                                ${
-                                    order.status ===
-                                    "Pending"
+                                ${orderStatus === "Pending"
                                     ? "selected"
-                                    : ""
-                                }
+                                    : ""}
                             >
                                 Pending
                             </option>
 
-
                             <option
                                 value="Confirmed"
-                                ${
-                                    order.status ===
-                                    "Confirmed"
+                                ${orderStatus === "Confirmed"
                                     ? "selected"
-                                    : ""
-                                }
+                                    : ""}
                             >
                                 Confirmed
                             </option>
 
-
                             <option
                                 value="Delivered"
-                                ${
-                                    order.status ===
-                                    "Delivered"
+                                ${orderStatus === "Delivered"
                                     ? "selected"
-                                    : ""
-                                }
+                                    : ""}
                             >
                                 Delivered
-                            </option>
-
-
-                            <option
-                                value="Cancelled"
-                                ${
-                                    order.status ===
-                                    "Cancelled"
-                                    ? "selected"
-                                    : ""
-                                }
-                            >
-                                Cancelled
                             </option>
 
                         </select>
@@ -336,14 +237,11 @@ async function loadOrders() {
                     </td>
 
 
-                    <!-- UPDATE -->
-
                     <td>
 
                         <button
-                            onclick="
-                                updateStatus('${id}')
-                            "
+                            class="update-btn"
+                            onclick="updateStatus('${id}')"
                         >
                             Update
                         </button>
@@ -351,10 +249,8 @@ async function loadOrders() {
                     </td>
 
 
-                    <!-- DATE -->
-
                     <td>
-                        ${createdDate}
+                        ${orderDate}
                     </td>
 
                 </tr>
@@ -363,11 +259,11 @@ async function loadOrders() {
 
         });
 
-    }
-    catch (error) {
+
+    } catch (error) {
 
         console.error(
-            "Load orders error:",
+            "Error loading orders:",
             error
         );
 
@@ -378,7 +274,7 @@ async function loadOrders() {
 
                 <td colspan="11">
 
-                    ❌ Failed to load orders
+                    ❌ Error loading orders
 
                     <br><br>
 
@@ -396,10 +292,6 @@ async function loadOrders() {
 
 
 
-// ===============================
-// UPDATE STATUS
-// ===============================
-
 window.updateStatus = async function(id) {
 
     try {
@@ -410,44 +302,36 @@ window.updateStatus = async function(id) {
             );
 
 
-        if (!select) {
-
-            alert("Status selector not found");
-
-            return;
-
-        }
-
-
-        const status = select.value;
+        const newStatus =
+            select.value;
 
 
         await updateDoc(
             doc(db, "orders", id),
             {
-                status: status
+                orderStatus: newStatus
             }
         );
 
 
         alert(
-            "Order status updated successfully"
+            "Order status updated successfully!"
         );
 
 
         loadOrders();
 
-    }
-    catch (error) {
+
+    } catch (error) {
 
         console.error(
-            "Update status error:",
+            "Status update error:",
             error
         );
 
 
         alert(
-            "Update failed:\n" +
+            "Update failed!\n\n" +
             error.message
         );
 
@@ -455,10 +339,5 @@ window.updateStatus = async function(id) {
 
 };
 
-
-
-// ===============================
-// START
-// ===============================
 
 loadOrders();
