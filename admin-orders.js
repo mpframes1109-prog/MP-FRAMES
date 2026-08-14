@@ -4,7 +4,9 @@ import {
     collection,
     getDocs,
     query,
-    orderBy
+    orderBy,
+    doc,
+    updateDoc
 } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
 import {
@@ -13,7 +15,12 @@ import {
 } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
 
 
-const ADMIN_UID = "6LssLKjKdpZFkIXbz9MfEZFqTGv1";
+// ======================================
+// ADMIN UID
+// ======================================
+
+const ADMIN_UID =
+    "6LssLKjKdpZFkIXbz9MfEZFqTGv1";
 
 
 // ======================================
@@ -22,41 +29,88 @@ const ADMIN_UID = "6LssLKjKdpZFkIXbz9MfEZFqTGv1";
 
 async function loadOrders() {
 
-    const tbody = document.getElementById("ordersBody");
+    const tbody =
+        document.getElementById("ordersBody");
 
     if (!tbody) {
-        console.error("ordersBody not found");
+
+        console.error(
+            "ordersBody not found"
+        );
+
         return;
     }
 
+
     tbody.innerHTML = `
         <tr>
-            <td colspan="13" class="loading">
+            <td
+                colspan="13"
+                class="loading"
+                style="
+                    text-align:center;
+                    padding:25px;
+                "
+            >
                 Loading Orders...
             </td>
         </tr>
     `;
 
+
     try {
 
-        console.log("Loading orders...");
-        console.log("Current Firebase user:", auth.currentUser);
+        console.log(
+            "Loading orders..."
+        );
+
+        console.log(
+            "Current Firebase user:",
+            auth.currentUser
+        );
+
+
+        // ==================================
+        // FIRESTORE QUERY
+        // ==================================
 
         const ordersQuery = query(
             collection(db, "orders"),
-            orderBy("createdAt", "desc")
+            orderBy(
+                "createdAt",
+                "desc"
+            )
         );
 
-        const snapshot = await getDocs(ordersQuery);
 
-        console.log("Orders found:", snapshot.size);
+        const snapshot =
+            await getDocs(
+                ordersQuery
+            );
 
+
+        console.log(
+            "Orders found:",
+            snapshot.size
+        );
+
+
+        // ==================================
+        // NO ORDERS
+        // ==================================
 
         if (snapshot.empty) {
 
             tbody.innerHTML = `
                 <tr>
-                    <td colspan="13" class="loading">
+                    <td
+                        colspan="13"
+                        style="
+                            text-align:center;
+                            padding:30px;
+                            color:#777;
+                        "
+                    >
                         No orders found.
                     </td>
                 </tr>
@@ -69,11 +123,22 @@ async function loadOrders() {
         tbody.innerHTML = "";
 
 
-        snapshot.forEach((doc) => {
+        // ==================================
+        // EACH ORDER
+        // ==================================
 
-            const order = doc.data();
+        snapshot.forEach((orderDoc) => {
 
-            const row = document.createElement("tr");
+            const order =
+                orderDoc.data();
+
+
+            const orderId =
+                orderDoc.id;
+
+
+            const row =
+                document.createElement("tr");
 
 
             // ==================================
@@ -81,6 +146,7 @@ async function loadOrders() {
             // ==================================
 
             let dateText = "-";
+
 
             if (order.createdAt) {
 
@@ -115,11 +181,15 @@ async function loadOrders() {
 
 
             // ==================================
-            // PHOTO
+            // CUSTOMER PHOTO
             // ==================================
 
             let imageHTML = `
-                <span style="color:#888;">
+                <span
+                    style="
+                        color:#888;
+                    "
+                >
                     No Image
                 </span>
             `;
@@ -128,11 +198,18 @@ async function loadOrders() {
             if (order.photo) {
 
                 const photoURL =
-                    escapeHTML(order.photo);
+                    escapeHTML(
+                        order.photo
+                    );
 
 
                 imageHTML = `
-                    <div class="photo-actions">
+                    <div
+                        class="photo-actions"
+                        style="
+                            text-align:center;
+                        "
+                    >
 
                         <img
                             src="${photoURL}"
@@ -162,7 +239,12 @@ async function loadOrders() {
                             Image failed
                         </span>
 
-                        <div style="margin-top:8px;">
+
+                        <div
+                            style="
+                                margin-top:8px;
+                            "
+                        >
 
                             <a
                                 href="${photoURL}"
@@ -181,6 +263,7 @@ async function loadOrders() {
                             >
                                 👁 View
                             </a>
+
 
                             <a
                                 href="${photoURL}"
@@ -210,7 +293,7 @@ async function loadOrders() {
 
 
             // ==================================
-            // PAYMENT
+            // PAYMENT STATUS
             // ==================================
 
             const paymentStatus =
@@ -219,7 +302,7 @@ async function loadOrders() {
 
 
             // ==================================
-            // STATUS
+            // ORDER STATUS
             // ==================================
 
             const orderStatus =
@@ -230,8 +313,29 @@ async function loadOrders() {
             // ==================================
             // ROW
             // ==================================
+            //
+            // IMPORTANT:
+            // Header order:
+            //
+            // 1 Name
+            // 2 Phone
+            // 3 Address
+            // 4 Frame
+            // 5 Frame Image
+            // 6 Quantity
+            // 7 Price
+            // 8 Customer Photo
+            // 9 Message
+            // 10 Payment
+            // 11 Status
+            // 12 Update
+            // 13 Date
+            //
+            // ==================================
 
             row.innerHTML = `
+
+                <!-- NAME -->
 
                 <td>
                     ${escapeHTML(
@@ -239,11 +343,17 @@ async function loadOrders() {
                     )}
                 </td>
 
+
+                <!-- PHONE -->
+
                 <td>
                     ${escapeHTML(
                         order.phone || "-"
                     )}
                 </td>
+
+
+                <!-- ADDRESS -->
 
                 <td>
                     ${escapeHTML(
@@ -251,11 +361,49 @@ async function loadOrders() {
                     )}
                 </td>
 
+
+                <!-- FRAME -->
+
                 <td>
                     ${escapeHTML(
                         order.frameName || "-"
                     )}
                 </td>
+
+
+                <!-- FRAME IMAGE -->
+
+                <td>
+                    ${
+                        order.frameImage
+                        ? `
+                            <img
+                                src="${escapeHTML(
+                                    order.frameImage
+                                )}"
+                                style="
+                                    width:80px;
+                                    height:80px;
+                                    object-fit:cover;
+                                    border-radius:6px;
+                                "
+                                alt="Frame"
+                            >
+                          `
+                        : `
+                            <span
+                                style="
+                                    color:#888;
+                                "
+                            >
+                                No Image
+                            </span>
+                          `
+                    }
+                </td>
+
+
+                <!-- QUANTITY -->
 
                 <td>
                     ${Number(
@@ -263,29 +411,24 @@ async function loadOrders() {
                     )}
                 </td>
 
+
+                <!-- PRICE -->
+
                 <td>
                     ₹${Number(
                         order.price || 0
                     ).toFixed(2)}
                 </td>
 
+
+                <!-- CUSTOMER PHOTO -->
+
                 <td>
                     ${imageHTML}
                 </td>
 
-                <td>
-                    <strong>
-                        ${escapeHTML(
-                            paymentStatus
-                        )}
-                    </strong>
-                </td>
 
-                <td>
-                    ${escapeHTML(
-                        orderStatus
-                    )}
-                </td>
+                <!-- MESSAGE -->
 
                 <td>
                     ${escapeHTML(
@@ -293,11 +436,142 @@ async function loadOrders() {
                     )}
                 </td>
 
+
+                <!-- PAYMENT -->
+
                 <td>
-                    ₹${Number(
-                        order.orderTotal || 0
-                    ).toFixed(2)}
+                    <strong
+                        style="
+                            color:${
+                                paymentStatus
+                                .toLowerCase()
+                                .includes("paid")
+                                ? "green"
+                                : "red"
+                            };
+                        "
+                    >
+                        ${escapeHTML(
+                            paymentStatus
+                        )}
+                    </strong>
                 </td>
+
+
+                <!-- STATUS -->
+
+                <td
+                    id="status-${orderId}"
+                >
+                    ${escapeHTML(
+                        orderStatus
+                    )}
+                </td>
+
+
+                <!-- UPDATE -->
+
+                <td>
+
+                    <select
+                        id="statusSelect-${orderId}"
+                        style="
+                            padding:6px;
+                            border-radius:5px;
+                            border:1px solid #ccc;
+                            margin-bottom:5px;
+                        "
+                    >
+
+                        <option
+                            value="Pending"
+                            ${
+                                orderStatus ===
+                                "Pending"
+                                ? "selected"
+                                : ""
+                            }
+                        >
+                            Pending
+                        </option>
+
+
+                        <option
+                            value="Processing"
+                            ${
+                                orderStatus ===
+                                "Processing"
+                                ? "selected"
+                                : ""
+                            }
+                        >
+                            Processing
+                        </option>
+
+
+                        <option
+                            value="Shipped"
+                            ${
+                                orderStatus ===
+                                "Shipped"
+                                ? "selected"
+                                : ""
+                            }
+                        >
+                            Shipped
+                        </option>
+
+
+                        <option
+                            value="Delivered"
+                            ${
+                                orderStatus ===
+                                "Delivered"
+                                ? "selected"
+                                : ""
+                            }
+                        >
+                            Delivered
+                        </option>
+
+
+                        <option
+                            value="Cancelled"
+                            ${
+                                orderStatus ===
+                                "Cancelled"
+                                ? "selected"
+                                : ""
+                            }
+                        >
+                            Cancelled
+                        </option>
+
+                    </select>
+
+
+                    <br>
+
+
+                    <button
+                        type="button"
+                        onclick="updateOrderStatus('${orderId}')"
+                        style="
+                            background:#111;
+                            color:white;
+                            border:none;
+                            padding:7px 12px;
+                            border-radius:5px;
+                            cursor:pointer;
+                        "
+                    >
+                        Update
+                    </button>
+
+                </td>
+
+
+                <!-- DATE -->
 
                 <td>
                     ${escapeHTML(
@@ -322,7 +596,9 @@ async function loadOrders() {
 
 
         tbody.innerHTML = `
+
             <tr>
+
                 <td
                     colspan="13"
                     style="
@@ -341,12 +617,107 @@ async function loadOrders() {
                     )}
 
                 </td>
+
             </tr>
+
         `;
 
     }
 
 }
+
+
+// ======================================
+// UPDATE ORDER STATUS
+// ======================================
+
+window.updateOrderStatus =
+    async function(orderId) {
+
+        try {
+
+            const select =
+                document.getElementById(
+                    `statusSelect-${orderId}`
+                );
+
+
+            if (!select) {
+
+                alert(
+                    "Status selector not found."
+                );
+
+                return;
+            }
+
+
+            const newStatus =
+                select.value;
+
+
+            // ==================================
+            // UPDATE FIRESTORE
+            // ==================================
+
+            await updateDoc(
+                doc(
+                    db,
+                    "orders",
+                    orderId
+                ),
+                {
+                    status: newStatus
+                }
+            );
+
+
+            // ==================================
+            // UPDATE DISPLAY
+            // ==================================
+
+            const statusCell =
+                document.getElementById(
+                    `status-${orderId}`
+                );
+
+
+            if (statusCell) {
+
+                statusCell.innerText =
+                    newStatus;
+
+            }
+
+
+            alert(
+                "Order status updated successfully."
+            );
+
+
+            console.log(
+                "Order updated:",
+                orderId,
+                newStatus
+            );
+
+
+        } catch (error) {
+
+            console.error(
+                "Status update error:",
+                error
+            );
+
+
+            alert(
+                "Failed to update order status:\n\n" +
+                error.message
+            );
+
+        }
+
+    };
 
 
 // ======================================
@@ -373,15 +744,19 @@ onAuthStateChanged(
                 "No user logged in."
             );
 
+
             const tbody =
                 document.getElementById(
                     "ordersBody"
                 );
 
+
             if (tbody) {
 
                 tbody.innerHTML = `
+
                     <tr>
+
                         <td
                             colspan="13"
                             style="
@@ -390,19 +765,25 @@ onAuthStateChanged(
                                 padding:25px;
                             "
                         >
+
                             ❌ Admin login required.
+
                         </td>
+
                     </tr>
+
                 `;
 
             }
 
+
             return;
+
         }
 
 
         // ==================================
-        // USER UID
+        // CHECK UID
         // ==================================
 
         console.log(
@@ -411,11 +792,10 @@ onAuthStateChanged(
         );
 
 
-        // ==================================
-        // ADMIN CHECK
-        // ==================================
-
-        if (user.uid !== ADMIN_UID) {
+        if (
+            user.uid !==
+            ADMIN_UID
+        ) {
 
             console.error(
                 "Wrong admin account:",
@@ -432,7 +812,9 @@ onAuthStateChanged(
             if (tbody) {
 
                 tbody.innerHTML = `
+
                     <tr>
+
                         <td
                             colspan="13"
                             style="
@@ -448,15 +830,21 @@ onAuthStateChanged(
                             <br><br>
 
                             UID:
-                            ${escapeHTML(user.uid)}
+                            ${escapeHTML(
+                                user.uid
+                            )}
 
                         </td>
+
                     </tr>
+
                 `;
 
             }
 
+
             return;
+
         }
 
 
@@ -480,34 +868,38 @@ onAuthStateChanged(
 // ======================================
 
 window.logoutAdmin =
-async function () {
+    async function() {
 
-    try {
+        try {
 
-        await signOut(auth);
+            await signOut(auth);
 
-        console.log(
-            "Admin logged out"
-        );
 
-        window.location.href =
-            "login.html";
+            console.log(
+                "Admin logged out"
+            );
 
-    } catch (error) {
 
-        console.error(
-            "Logout error:",
-            error
-        );
+            window.location.href =
+                "login.html";
 
-        alert(
-            "Logout failed:\n\n" +
-            error.message
-        );
 
-    }
+        } catch (error) {
 
-};
+            console.error(
+                "Logout error:",
+                error
+            );
+
+
+            alert(
+                "Logout failed:\n\n" +
+                error.message
+            );
+
+        }
+
+    };
 
 
 // ======================================
