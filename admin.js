@@ -1,31 +1,41 @@
-import { db, auth } from "./firebase.js";
+import { app, db } from "./firebase.js";
 
 import {
-    collection,
-    getDocs,
-    addDoc,
-    deleteDoc,
-    updateDoc,
-    doc
-} from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
-
-import {
+    getAuth,
     onAuthStateChanged,
     signOut
 } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
 
+import {
+    collection,
+    addDoc,
+    getDocs,
+    deleteDoc,
+    doc
+} from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
-const ADMIN_UID =
-    "6LssLKjKdpZFkIXbz9MfEZFqTGv1";
+
+// ==========================================
+// ADMIN AUTH
+// ==========================================
+
+const auth = getAuth(app);
 
 
-// ======================================
+// ==========================================
+// CLOUDINARY
+// ==========================================
+
+const CLOUDINARY_CLOUD_NAME = "YOUR_CLOUD_NAME";
+
+const CLOUDINARY_UPLOAD_PRESET = "mpframes";
+
+
+// ==========================================
 // AUTH CHECK
-// ======================================
+// ==========================================
 
-onAuthStateChanged(auth, async (user) => {
-
-    console.log("Admin auth:", user);
+onAuthStateChanged(auth, (user) => {
 
     if (!user) {
 
@@ -34,249 +44,402 @@ onAuthStateChanged(auth, async (user) => {
         return;
     }
 
-
-    if (user.uid !== ADMIN_UID) {
-
-        alert("You are not authorized as admin.");
-
-        await signOut(auth);
-
-        window.location.href = "login.html";
-
-        return;
-    }
-
-
-    console.log("✅ Admin logged in");
+    console.log(
+        "Admin logged in:",
+        user.uid
+    );
 
     loadProducts();
 
 });
 
 
-// ======================================
-// ADD PRODUCT
-// ======================================
+// ==========================================
+// ELEMENT
+// ==========================================
 
-window.addProduct = async function () {
-
-    const nameInput =
-        document.getElementById("productName");
-
-    const priceInput =
-        document.getElementById("productPrice");
-
-    const categoryInput =
-        document.getElementById("productCategory");
-
-    const imageInput =
-        document.getElementById("productImage");
+const productList =
+    document.getElementById("product-list");
 
 
-    const name =
-        nameInput?.value.trim();
+// ==========================================
+// UPLOAD PRODUCT IMAGE
+// ==========================================
 
-    const price =
-        Number(priceInput?.value);
+async function uploadProductImage(file) {
 
-    const category =
-        categoryInput?.value.trim();
+    if (
+        !CLOUDINARY_CLOUD_NAME ||
+        CLOUDINARY_CLOUD_NAME === "YOUR_CLOUD_NAME"
+    ) {
 
+        throw new Error(
+            "Cloudinary Cloud Name is not configured."
+        );
 
-    if (!name) {
-
-        alert("Enter product name.");
-
-        return;
     }
-
-
-    if (!price || price <= 0) {
-
-        alert("Enter valid product price.");
-
-        return;
-    }
-
-
-    if (!category) {
-
-        alert("Enter product category.");
-
-        return;
-    }
-
-
-    const file =
-        imageInput?.files?.[0];
 
 
     if (!file) {
 
-        alert("Please select product image.");
+        throw new Error(
+            "Please select a product image."
+        );
 
-        return;
     }
 
 
-    if (!file.type.startsWith("image/")) {
-
-        alert("Please select an image file.");
-
-        return;
-    }
+    const uploadURL =
+        `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`;
 
 
-    try {
-
-        const button =
-            document.querySelector(
-                ".add-product-btn"
-            );
+    const formData =
+        new FormData();
 
 
-        if (button) {
-
-            button.disabled = true;
-
-            button.innerText =
-                "Uploading...";
-        }
+    formData.append(
+        "file",
+        file
+    );
 
 
-        /*
-         IMPORTANT
-
-         Firebase Storage is NOT used here.
-
-         We convert the image to Base64
-         and store it directly inside Firestore.
-        */
-
-        const imageBase64 =
-            await fileToBase64(file);
+    formData.append(
+        "upload_preset",
+        CLOUDINARY_UPLOAD_PRESET
+    );
 
 
-        await addDoc(
-            collection(db, "products"),
+    const response =
+        await fetch(
+            uploadURL,
             {
-
-                name: name,
-
-                price: price,
-
-                category: category,
-
-                image: imageBase64,
-
-                createdAt:
-                    new Date()
-
+                method: "POST",
+                body: formData
             }
         );
 
 
-        alert(
-            "Product added successfully!"
-        );
-
-
-        if (nameInput)
-            nameInput.value = "";
-
-        if (priceInput)
-            priceInput.value = "";
-
-        if (categoryInput)
-            categoryInput.value = "";
-
-        if (imageInput)
-            imageInput.value = "";
-
-
-        loadProducts();
-
-
-    } catch (error) {
-
-        console.error(
-            "ADD PRODUCT ERROR:",
-            error
-        );
-
-
-        alert(
-            "Failed to add product:\n\n" +
-            error.message
-        );
-
-    } finally {
-
-        const button =
-            document.querySelector(
-                ".add-product-btn"
-            );
-
-
-        if (button) {
-
-            button.disabled = false;
-
-            button.innerText =
-                "Add Product";
-        }
-
-    }
-
-};
-
-
-// ======================================
-// LOAD PRODUCTS
-// ======================================
-
-async function loadProducts() {
-
-    const container =
-        document.getElementById(
-            "productsList"
-        );
+    const data =
+        await response.json();
 
 
     console.log(
-        "loadProducts() started"
+        "Cloudinary response:",
+        data
     );
 
 
-    if (!container) {
+    if (!response.ok) {
 
-        console.error(
-            "❌ productsList element not found"
+        throw new Error(
+            data.error?.message ||
+            "Image upload failed."
         );
 
-        return;
     }
 
 
-    container.innerHTML = `
-        <div
-            style="
-                text-align:center;
-                padding:30px;
-                color:#777;
-            "
-        >
+    if (!data.secure_url) {
+
+        throw new Error(
+            "Cloudinary image URL not received."
+        );
+
+    }
+
+
+    return data.secure_url;
+
+}
+
+
+// ==========================================
+// ADD PRODUCT
+// ==========================================
+
+window.addProduct =
+    async function () {
+
+
+        const nameInput =
+            document.getElementById("name");
+
+
+        const priceInput =
+            document.getElementById("price");
+
+
+        const imageInput =
+            document.getElementById("image");
+
+
+        const name =
+            nameInput?.value.trim();
+
+
+        const price =
+            priceInput?.value.trim();
+
+
+        // IMPORTANT:
+        // File input uses .files[0]
+
+        const imageFile =
+            imageInput?.files?.[0];
+
+
+        // ======================================
+        // VALIDATION
+        // ======================================
+
+        if (!name) {
+
+            alert(
+                "Please enter product name."
+            );
+
+            nameInput?.focus();
+
+            return;
+
+        }
+
+
+        if (!price) {
+
+            alert(
+                "Please enter product price."
+            );
+
+            priceInput?.focus();
+
+            return;
+
+        }
+
+
+        if (!imageFile) {
+
+            alert(
+                "Please select a product image."
+            );
+
+            imageInput?.focus();
+
+            return;
+
+        }
+
+
+        if (
+            !imageFile.type.startsWith("image/")
+        ) {
+
+            alert(
+                "Please select a valid image file."
+            );
+
+            return;
+
+        }
+
+
+        // Maximum 5 MB
+
+        if (
+            imageFile.size >
+            5 * 1024 * 1024
+        ) {
+
+            alert(
+                "Image must be less than 5 MB."
+            );
+
+            return;
+
+        }
+
+
+        const button =
+            document.querySelector(
+                'button[onclick="addProduct()"]'
+            );
+
+
+        try {
+
+
+            if (button) {
+
+                button.disabled =
+                    true;
+
+                button.innerText =
+                    "Uploading Image...";
+
+            }
+
+
+            // ======================================
+            // CLOUDINARY
+            // ======================================
+
+            const imageURL =
+                await uploadProductImage(
+                    imageFile
+                );
+
+
+            console.log(
+                "Product image URL:",
+                imageURL
+            );
+
+
+            // ======================================
+            // FIRESTORE
+            // ======================================
+
+            if (button) {
+
+                button.innerText =
+                    "Saving Product...";
+
+            }
+
+
+            const productData = {
+
+                name:
+                    name,
+
+                price:
+                    Number(price),
+
+                image:
+                    imageURL,
+
+                createdAt:
+                    new Date()
+
+            };
+
+
+            const productRef =
+                await addDoc(
+                    collection(
+                        db,
+                        "products"
+                    ),
+                    productData
+                );
+
+
+            console.log(
+                "Product added:",
+                productRef.id
+            );
+
+
+            // ======================================
+            // CLEAR FORM
+            // ======================================
+
+            if (nameInput) {
+
+                nameInput.value = "";
+
+            }
+
+
+            if (priceInput) {
+
+                priceInput.value = "";
+
+            }
+
+
+            if (imageInput) {
+
+                imageInput.value = "";
+
+            }
+
+
+            alert(
+                "Product Added Successfully! ✅"
+            );
+
+
+            // ======================================
+            // RELOAD
+            // ======================================
+
+            await loadProducts();
+
+
+        }
+        catch (error) {
+
+            console.error(
+                "Add product error:",
+                error
+            );
+
+
+            alert(
+                "Product upload failed.\n\n" +
+                error.message
+            );
+
+        }
+        finally {
+
+            if (button) {
+
+                button.disabled =
+                    false;
+
+                button.innerText =
+                    "Add Product";
+
+            }
+
+        }
+
+    };
+
+
+// ==========================================
+// LOAD PRODUCTS
+// ==========================================
+
+async function loadProducts() {
+
+    if (!productList) {
+
+        console.error(
+            "product-list not found."
+        );
+
+        return;
+
+    }
+
+
+    productList.innerHTML = `
+
+        <p style="
+            text-align:center;
+            padding:20px;
+        ">
             Loading products...
-        </div>
+        </p>
+
     `;
 
 
     try {
-
-        console.log(
-            "Reading products collection..."
-        );
-
 
         const snapshot =
             await getDocs(
@@ -287,251 +450,158 @@ async function loadProducts() {
             );
 
 
-        console.log(
-            "Products found:",
-            snapshot.size
-        );
-
-
         if (snapshot.empty) {
 
-            container.innerHTML = `
-                <div
-                    style="
-                        text-align:center;
-                        padding:30px;
-                        color:#777;
-                    "
-                >
+            productList.innerHTML = `
+
+                <p style="
+                    text-align:center;
+                    padding:20px;
+                ">
                     No products found.
-                </div>
+                </p>
+
             `;
 
             return;
+
         }
 
 
-        container.innerHTML = "";
+        productList.innerHTML = "";
 
 
-        snapshot.forEach(
-            (productDoc) => {
+        snapshot.forEach((item) => {
 
-                const product =
-                    productDoc.data();
-
-
-                const productId =
-                    productDoc.id;
+            const product =
+                item.data();
 
 
-                const card =
-                    document.createElement(
-                        "div"
-                    );
+            const card =
+                document.createElement("div");
 
 
-                card.style.cssText = `
-                    background:#fff;
-                    border-radius:10px;
-                    padding:18px;
-                    margin-bottom:15px;
-                    box-shadow:0 3px 12px rgba(0,0,0,.08);
-                `;
+            card.style.cssText = `
+
+                background:white;
+                padding:15px;
+                border-radius:10px;
+                text-align:center;
+                box-shadow:0 0 10px rgba(0,0,0,.1);
+
+            `;
 
 
-                const image =
-                    product.image || "";
+            const image =
+                document.createElement("img");
 
 
-                card.innerHTML = `
-
-                    <div
-                        style="
-                            display:flex;
-                            gap:20px;
-                            align-items:center;
-                            flex-wrap:wrap;
-                        "
-                    >
-
-                        ${
-                            image
-                            ?
-                            `
-                            <img
-                                src="${escapeHTML(image)}"
-                                alt="${escapeHTML(
-                                    product.name || "Product"
-                                )}"
-                                style="
-                                    width:120px;
-                                    height:120px;
-                                    object-fit:cover;
-                                    border-radius:8px;
-                                    border:1px solid #ddd;
-                                "
-                                onerror="
-                                    this.style.display='none';
-                                "
-                            >
-                            `
-                            :
-                            `
-                            <div
-                                style="
-                                    width:120px;
-                                    height:120px;
-                                    display:flex;
-                                    align-items:center;
-                                    justify-content:center;
-                                    background:#eee;
-                                    border-radius:8px;
-                                    color:#777;
-                                "
-                            >
-                                No Image
-                            </div>
-                            `
-                        }
+            image.src =
+                product.image || "";
 
 
-                        <div
-                            style="
-                                flex:1;
-                                min-width:200px;
-                            "
-                        >
-
-                            <h3
-                                style="
-                                    margin:0 0 8px;
-                                "
-                            >
-                                ${escapeHTML(
-                                    product.name || "-"
-                                )}
-                            </h3>
+            image.alt =
+                product.name || "Product";
 
 
-                            <p>
-                                <strong>
-                                    Price:
-                                </strong>
+            image.style.cssText = `
 
-                                ₹${Number(
-                                    product.price || 0
-                                ).toFixed(2)}
-                            </p>
+                width:180px;
+                height:180px;
+                object-fit:cover;
+                border-radius:8px;
 
-
-                            <p>
-                                <strong>
-                                    Category:
-                                </strong>
-
-                                ${escapeHTML(
-                                    product.category || "-"
-                                )}
-                            </p>
-
-                        </div>
+            `;
 
 
-                        <div>
-
-                            <button
-                                type="button"
-                                onclick="editProduct('${productId}')"
-                                style="
-                                    background:#007bff;
-                                    color:white;
-                                    border:none;
-                                    padding:9px 14px;
-                                    border-radius:6px;
-                                    cursor:pointer;
-                                    margin-right:6px;
-                                "
-                            >
-                                Edit
-                            </button>
+            const title =
+                document.createElement("h3");
 
 
-                            <button
-                                type="button"
-                                onclick="deleteProduct('${productId}')"
-                                style="
-                                    background:#dc3545;
-                                    color:white;
-                                    border:none;
-                                    padding:9px 14px;
-                                    border-radius:6px;
-                                    cursor:pointer;
-                                "
-                            >
-                                Delete
-                            </button>
-
-                        </div>
-
-                    </div>
-
-                `;
+            title.innerText =
+                product.name || "Unnamed Product";
 
 
-                container.appendChild(
-                    card
+            const price =
+                document.createElement("h4");
+
+
+            price.innerText =
+                `₹${Number(product.price || 0).toFixed(2)}`;
+
+
+            const deleteButton =
+                document.createElement("button");
+
+
+            deleteButton.innerText =
+                "Delete";
+
+
+            deleteButton.style.cssText = `
+
+                background:#d32f2f;
+                color:white;
+                border:none;
+                padding:10px 18px;
+                border-radius:6px;
+                cursor:pointer;
+
+            `;
+
+
+            deleteButton.onclick =
+                () => deleteProduct(
+                    item.id
                 );
 
-            }
-        );
+
+            card.appendChild(
+                image
+            );
 
 
-    } catch (error) {
+            card.appendChild(
+                title
+            );
+
+
+            card.appendChild(
+                price
+            );
+
+
+            card.appendChild(
+                deleteButton
+            );
+
+
+            productList.appendChild(
+                card
+            );
+
+        });
+
+
+    }
+    catch (error) {
 
         console.error(
-            "❌ LOAD PRODUCTS ERROR:",
+            "Load products error:",
             error
         );
 
 
-        container.innerHTML = `
+        productList.innerHTML = `
 
-            <div
-                style="
-                    color:red;
-                    text-align:center;
-                    padding:30px;
-                "
-            >
-
-                <strong>
-                    ❌ Unable to load products
-                </strong>
-
-                <br><br>
-
-                ${escapeHTML(
-                    error.message
-                )}
-
-                <br><br>
-
-                <button
-                    onclick="loadProducts()"
-                    style="
-                        background:#111;
-                        color:white;
-                        border:none;
-                        padding:10px 18px;
-                        border-radius:6px;
-                        cursor:pointer;
-                    "
-                >
-                    Retry
-                </button>
-
-            </div>
+            <p style="
+                color:red;
+                text-align:center;
+                padding:20px;
+            ">
+                Error loading products:
+                ${escapeHTML(error.message)}
+            </p>
 
         `;
 
@@ -540,12 +610,19 @@ async function loadProducts() {
 }
 
 
-// ======================================
+// ==========================================
 // DELETE PRODUCT
-// ======================================
+// ==========================================
 
 window.deleteProduct =
-    async function(productId) {
+    async function (id) {
+
+        if (!id) {
+
+            return;
+
+        }
+
 
         const confirmDelete =
             confirm(
@@ -556,6 +633,7 @@ window.deleteProduct =
         if (!confirmDelete) {
 
             return;
+
         }
 
 
@@ -565,7 +643,7 @@ window.deleteProduct =
                 doc(
                     db,
                     "products",
-                    productId
+                    id
                 )
             );
 
@@ -575,10 +653,10 @@ window.deleteProduct =
             );
 
 
-            loadProducts();
+            await loadProducts();
 
-
-        } catch (error) {
+        }
+        catch (error) {
 
             console.error(
                 "Delete product error:",
@@ -587,7 +665,7 @@ window.deleteProduct =
 
 
             alert(
-                "Delete failed:\n\n" +
+                "Delete failed.\n\n" +
                 error.message
             );
 
@@ -596,132 +674,25 @@ window.deleteProduct =
     };
 
 
-// ======================================
-// EDIT PRODUCT
-// ======================================
-
-window.editProduct =
-    async function(productId) {
-
-        const newName =
-            prompt(
-                "Enter new product name:"
-            );
-
-
-        if (newName === null) {
-
-            return;
-        }
-
-
-        const newPrice =
-            prompt(
-                "Enter new product price:"
-            );
-
-
-        if (newPrice === null) {
-
-            return;
-        }
-
-
-        const newCategory =
-            prompt(
-                "Enter new category:"
-            );
-
-
-        if (newCategory === null) {
-
-            return;
-        }
-
-
-        const price =
-            Number(newPrice);
-
-
-        if (
-            !newName.trim() ||
-            !price ||
-            price <= 0 ||
-            !newCategory.trim()
-        ) {
-
-            alert(
-                "Invalid product details."
-            );
-
-            return;
-        }
-
-
-        try {
-
-            await updateDoc(
-                doc(
-                    db,
-                    "products",
-                    productId
-                ),
-                {
-
-                    name:
-                        newName.trim(),
-
-                    price:
-                        price,
-
-                    category:
-                        newCategory.trim()
-
-                }
-            );
-
-
-            alert(
-                "Product updated successfully."
-            );
-
-
-            loadProducts();
-
-
-        } catch (error) {
-
-            console.error(
-                "Edit product error:",
-                error
-            );
-
-
-            alert(
-                "Update failed:\n\n" +
-                error.message
-            );
-
-        }
-
-    };
-
-
-// ======================================
+// ==========================================
 // LOGOUT
-// ======================================
+// ==========================================
 
-window.logoutAdmin =
-    async function() {
+window.logout =
+    async function () {
 
         try {
 
-            await signOut(auth);
+            await signOut(
+                auth
+            );
+
 
             window.location.href =
                 "login.html";
 
-        } catch (error) {
+        }
+        catch (error) {
 
             console.error(
                 "Logout error:",
@@ -730,7 +701,7 @@ window.logoutAdmin =
 
 
             alert(
-                "Logout failed:\n\n" +
+                "Logout failed: " +
                 error.message
             );
 
@@ -739,46 +710,9 @@ window.logoutAdmin =
     };
 
 
-// ======================================
-// FILE → BASE64
-// ======================================
-
-function fileToBase64(file) {
-
-    return new Promise(
-        (resolve, reject) => {
-
-            const reader =
-                new FileReader();
-
-
-            reader.onload =
-                () => resolve(
-                    reader.result
-                );
-
-
-            reader.onerror =
-                () => reject(
-                    new Error(
-                        "Failed to read image."
-                    )
-                );
-
-
-            reader.readAsDataURL(
-                file
-            );
-
-        }
-    );
-
-}
-
-
-// ======================================
+// ==========================================
 // ESCAPE HTML
-// ======================================
+// ==========================================
 
 function escapeHTML(value) {
 
@@ -793,27 +727,22 @@ function escapeHTML(value) {
 
 
     return String(value)
-
         .replace(
             /&/g,
             "&amp;"
         )
-
         .replace(
             /</g,
             "&lt;"
         )
-
         .replace(
             />/g,
             "&gt;"
         )
-
         .replace(
             /"/g,
             "&quot;"
         )
-
         .replace(
             /'/g,
             "&#039;"
