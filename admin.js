@@ -90,7 +90,7 @@ async function uploadProductImage(file) {
 
 
     const uploadURL =
-        `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`;
+        `https://api.cloudinary.com/v1_1/${dqavm3wk}/image/upload`;
 
 
     const formData =
