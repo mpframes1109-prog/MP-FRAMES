@@ -696,3 +696,71 @@ nav{
 }
 }
 ```
+.camera-hero {
+    position: relative;
+    width: 100%;
+    height: 380px;
+    overflow: hidden;
+    background: #111;
+}
+
+.camera-video {
+    position: absolute;
+    inset: 0;
+
+    width: 100%;
+    height: 100%;
+
+    object-fit: cover;
+    object-position: center;
+
+    z-index: 1;
+}
+
+.camera-overlay {
+    position: absolute;
+    inset: 0;
+
+    z-index: 2;
+
+    display: flex;
+    flex-direction: column;
+
+    align-items: center;
+    justify-content: center;
+
+    text-align: center;
+
+    background: rgba(0, 0, 0, 0.28);
+
+    color: white;
+}
+
+.camera-overlay h1 {
+    font-size: 38px;
+    margin: 0 0 10px;
+}
+
+.camera-overlay p {
+    font-size: 18px;
+    margin: 0 0 22px;
+}
+
+.hero-btn {
+    display: inline-block;
+
+    padding: 12px 24px;
+
+    background: #111;
+    color: white;
+
+    text-decoration: none;
+
+    border-radius: 6px;
+
+    font-weight: bold;
+}
+
+.hero-btn:hover {
+    background: #333;
+}
