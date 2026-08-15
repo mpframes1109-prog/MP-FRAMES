@@ -11,7 +11,8 @@ import {
     addDoc,
     getDocs,
     deleteDoc,
-    doc
+    doc,
+    updateDoc
 } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
 
@@ -34,7 +35,6 @@ const ADMIN_UID = "6LssLKjKdpZFkIXbz9MfEZFqTGv1";
 // =====================================================
 
 const CLOUDINARY_CLOUD_NAME = "dqavm3wk";
-
 const CLOUDINARY_UPLOAD_PRESET = "mpframes";
 
 
@@ -53,9 +53,7 @@ onAuthStateChanged(auth, async (user) => {
         return;
     }
 
-
     console.log("Logged in UID:", user.uid);
-
 
     if (user.uid !== ADMIN_UID) {
 
@@ -68,9 +66,7 @@ onAuthStateChanged(auth, async (user) => {
         return;
     }
 
-
     console.log("✅ Admin verified");
-
 
     await loadProducts();
 
@@ -84,66 +80,47 @@ onAuthStateChanged(auth, async (user) => {
 async function uploadToCloudinary(file) {
 
     if (!CLOUDINARY_CLOUD_NAME) {
-
         throw new Error(
             "Cloudinary Cloud Name is not configured."
         );
-
     }
 
-
     if (!CLOUDINARY_UPLOAD_PRESET) {
-
         throw new Error(
             "Cloudinary Upload Preset is not configured."
         );
-
     }
-
 
     const url =
         `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`;
 
-
     const formData = new FormData();
 
-
-    formData.append(
-        "file",
-        file
-    );
-
+    formData.append("file", file);
 
     formData.append(
         "upload_preset",
         CLOUDINARY_UPLOAD_PRESET
     );
 
-
     console.log(
         "Uploading image to Cloudinary..."
     );
 
+    const response = await fetch(
+        url,
+        {
+            method: "POST",
+            body: formData
+        }
+    );
 
-    const response =
-        await fetch(
-            url,
-            {
-                method: "POST",
-                body: formData
-            }
-        );
-
-
-    const data =
-        await response.json();
-
+    const data = await response.json();
 
     console.log(
         "Cloudinary response:",
         data
     );
-
 
     if (!response.ok) {
 
@@ -154,7 +131,6 @@ async function uploadToCloudinary(file) {
 
     }
 
-
     if (!data.secure_url) {
 
         throw new Error(
@@ -162,7 +138,6 @@ async function uploadToCloudinary(file) {
         );
 
     }
-
 
     return data.secure_url;
 
@@ -191,14 +166,11 @@ window.addProduct = async function () {
     const name =
         nameInput?.value.trim() || "";
 
-
     const price =
         priceInput?.value.trim() || "";
 
-
     const category =
         categoryInput?.value.trim() || "";
-
 
     const imageFile =
         imageInput?.files?.[0];
@@ -210,7 +182,9 @@ window.addProduct = async function () {
 
     if (!name) {
 
-        alert("Please enter product name.");
+        alert(
+            "Please enter product name."
+        );
 
         nameInput?.focus();
 
@@ -220,7 +194,9 @@ window.addProduct = async function () {
 
     if (!price) {
 
-        alert("Please enter product price.");
+        alert(
+            "Please enter product price."
+        );
 
         priceInput?.focus();
 
@@ -233,7 +209,9 @@ window.addProduct = async function () {
         Number(price) <= 0
     ) {
 
-        alert("Please enter a valid price.");
+        alert(
+            "Please enter a valid price."
+        );
 
         return;
     }
@@ -241,7 +219,9 @@ window.addProduct = async function () {
 
     if (!imageFile) {
 
-        alert("Please select a product image.");
+        alert(
+            "Please select a product image."
+        );
 
         return;
     }
@@ -251,7 +231,9 @@ window.addProduct = async function () {
         !imageFile.type.startsWith("image/")
     ) {
 
-        alert("Please select a valid image.");
+        alert(
+            "Please select a valid image."
+        );
 
         return;
     }
@@ -299,12 +281,6 @@ window.addProduct = async function () {
             await uploadToCloudinary(
                 imageFile
             );
-
-
-        console.log(
-            "Cloudinary URL:",
-            imageURL
-        );
 
 
         if (button) {
@@ -376,10 +352,6 @@ window.addProduct = async function () {
         );
 
 
-        // =================================================
-        // RELOAD
-        // =================================================
-
         await loadProducts();
 
     }
@@ -389,7 +361,6 @@ window.addProduct = async function () {
             "❌ ADD PRODUCT ERROR:",
             error
         );
-
 
         alert(
             "Product upload failed:\n\n" +
@@ -418,9 +389,6 @@ window.addProduct = async function () {
 // =====================================================
 
 async function loadProducts() {
-
-    // IMPORTANT:
-    // Your HTML uses products-List
 
     const list =
         document.getElementById(
@@ -454,24 +422,6 @@ async function loadProducts() {
 
     try {
 
-        console.log(
-            "================================="
-        );
-
-        console.log(
-            "Loading products..."
-        );
-
-        console.log(
-            "Firebase DB:",
-            db
-        );
-
-
-        // =================================================
-        // GET PRODUCTS
-        // =================================================
-
         const productsRef =
             collection(
                 db,
@@ -491,10 +441,6 @@ async function loadProducts() {
         );
 
 
-        // =================================================
-        // EMPTY
-        // =================================================
-
         if (snapshot.empty) {
 
             list.innerHTML = `
@@ -509,10 +455,6 @@ async function loadProducts() {
                         No Products Found
                     </h3>
 
-                    <p>
-                        Firestore products collection is empty.
-                    </p>
-
                 </div>
 
             `;
@@ -521,16 +463,8 @@ async function loadProducts() {
         }
 
 
-        // =================================================
-        // CLEAR
-        // =================================================
-
         list.innerHTML = "";
 
-
-        // =================================================
-        // DISPLAY PRODUCTS
-        // =================================================
 
         snapshot.forEach(
             (productDoc) => {
@@ -538,13 +472,13 @@ async function loadProducts() {
                 const product =
                     productDoc.data();
 
+                const productId =
+                    productDoc.id;
 
-                console.log(
-                    "PRODUCT:",
-                    productDoc.id,
-                    product
-                );
 
+                // =================================================
+                // CARD
+                // =================================================
 
                 const card =
                     document.createElement(
@@ -587,7 +521,6 @@ async function loadProducts() {
 
                 image.src =
                     product.image || "";
-
 
                 image.alt =
                     product.name ||
@@ -687,6 +620,75 @@ async function loadProducts() {
 
 
                 // =================================================
+                // BUTTON CONTAINER
+                // =================================================
+
+                const buttons =
+                    document.createElement(
+                        "div"
+                    );
+
+
+                buttons.style.cssText = `
+
+                    display:flex;
+
+                    justify-content:center;
+
+                    gap:8px;
+
+                    flex-wrap:wrap;
+
+                    margin-top:12px;
+
+                `;
+
+
+                // =================================================
+                // EDIT BUTTON
+                // =================================================
+
+                const editButton =
+                    document.createElement(
+                        "button"
+                    );
+
+
+                editButton.innerText =
+                    "✏️ Edit";
+
+
+                editButton.style.cssText = `
+
+                    background:#1976d2;
+
+                    color:white;
+
+                    border:none;
+
+                    border-radius:6px;
+
+                    padding:10px 18px;
+
+                    cursor:pointer;
+
+                    font-weight:bold;
+
+                `;
+
+
+                editButton.onclick =
+                    function () {
+
+                        openEditProduct(
+                            productId,
+                            product
+                        );
+
+                    };
+
+
+                // =================================================
                 // DELETE BUTTON
                 // =================================================
 
@@ -697,7 +699,7 @@ async function loadProducts() {
 
 
                 deleteButton.innerText =
-                    "Delete";
+                    "🗑 Delete";
 
 
                 deleteButton.style.cssText = `
@@ -710,13 +712,11 @@ async function loadProducts() {
 
                     border-radius:6px;
 
-                    padding:10px 20px;
+                    padding:10px 18px;
 
                     cursor:pointer;
 
                     font-weight:bold;
-
-                    margin-top:10px;
 
                 `;
 
@@ -725,7 +725,7 @@ async function loadProducts() {
                     async function () {
 
                         await deleteProduct(
-                            productDoc.id
+                            productId
                         );
 
                     };
@@ -735,28 +735,33 @@ async function loadProducts() {
                 // APPEND
                 // =================================================
 
+                buttons.appendChild(
+                    editButton
+                );
+
+                buttons.appendChild(
+                    deleteButton
+                );
+
+
                 card.appendChild(
                     image
                 );
-
 
                 card.appendChild(
                     title
                 );
 
-
                 card.appendChild(
                     price
                 );
-
 
                 card.appendChild(
                     category
                 );
 
-
                 card.appendChild(
-                    deleteButton
+                    buttons
                 );
 
 
@@ -802,6 +807,514 @@ async function loadProducts() {
             </div>
 
         `;
+
+    }
+
+}
+
+
+// =====================================================
+// EDIT PRODUCT
+// =====================================================
+
+window.openEditProduct =
+    function (productId, product) {
+
+        // Remove old modal if exists
+
+        const oldModal =
+            document.getElementById(
+                "editProductModal"
+            );
+
+        if (oldModal) {
+            oldModal.remove();
+        }
+
+
+        // =================================================
+        // MODAL
+        // =================================================
+
+        const modal =
+            document.createElement(
+                "div"
+            );
+
+
+        modal.id =
+            "editProductModal";
+
+
+        modal.style.cssText = `
+
+            position:fixed;
+
+            inset:0;
+
+            background:rgba(0,0,0,.65);
+
+            z-index:99999;
+
+            display:flex;
+
+            align-items:center;
+
+            justify-content:center;
+
+            padding:20px;
+
+            box-sizing:border-box;
+
+        `;
+
+
+        modal.innerHTML = `
+
+            <div style="
+
+                width:100%;
+
+                max-width:480px;
+
+                max-height:90vh;
+
+                overflow-y:auto;
+
+                background:white;
+
+                border-radius:14px;
+
+                padding:25px;
+
+                box-sizing:border-box;
+
+                box-shadow:
+                    0 10px 40px
+                    rgba(0,0,0,.3);
+
+            ">
+
+                <h2 style="
+                    margin-top:0;
+                    text-align:center;
+                ">
+                    ✏️ Edit Product
+                </h2>
+
+
+                <label>
+                    Product Name
+                </label>
+
+                <input
+                    id="editProductName"
+                    type="text"
+                    value="${escapeAttribute(
+                        product.name || ""
+                    )}"
+                    style="
+                        width:100%;
+                        padding:11px;
+                        margin:7px 0 15px;
+                        box-sizing:border-box;
+                    "
+                >
+
+
+                <label>
+                    Price
+                </label>
+
+                <input
+                    id="editProductPrice"
+                    type="number"
+                    value="${Number(
+                        product.price || 0
+                    )}"
+                    style="
+                        width:100%;
+                        padding:11px;
+                        margin:7px 0 15px;
+                        box-sizing:border-box;
+                    "
+                >
+
+
+                <label>
+                    Category
+                </label>
+
+                <input
+                    id="editProductCategory"
+                    type="text"
+                    value="${escapeAttribute(
+                        product.category || ""
+                    )}"
+                    style="
+                        width:100%;
+                        padding:11px;
+                        margin:7px 0 15px;
+                        box-sizing:border-box;
+                    "
+                >
+
+
+                <label>
+                    Current Image
+                </label>
+
+                <div style="
+                    text-align:center;
+                    margin:10px 0 18px;
+                ">
+
+                    <img
+                        src="${escapeAttribute(
+                            product.image || ""
+                        )}"
+                        style="
+                            width:150px;
+                            height:150px;
+                            object-fit:cover;
+                            border-radius:10px;
+                        "
+                    >
+
+                </div>
+
+
+                <label>
+                    Change Image
+                    <small>
+                        (optional)
+                    </small>
+                </label>
+
+                <input
+                    id="editProductImage"
+                    type="file"
+                    accept="image/*"
+                    style="
+                        width:100%;
+                        margin:8px 0 20px;
+                    "
+                >
+
+
+                <div style="
+                    display:flex;
+                    gap:10px;
+                ">
+
+                    <button
+                        id="saveEditButton"
+                        style="
+                            flex:1;
+                            padding:12px;
+                            background:#1976d2;
+                            color:white;
+                            border:none;
+                            border-radius:7px;
+                            cursor:pointer;
+                            font-weight:bold;
+                        "
+                    >
+                        💾 Save Changes
+                    </button>
+
+
+                    <button
+                        id="cancelEditButton"
+                        style="
+                            flex:1;
+                            padding:12px;
+                            background:#777;
+                            color:white;
+                            border:none;
+                            border-radius:7px;
+                            cursor:pointer;
+                            font-weight:bold;
+                        "
+                    >
+                        Cancel
+                    </button>
+
+                </div>
+
+            </div>
+
+        `;
+
+
+        document.body.appendChild(
+            modal
+        );
+
+
+        // =================================================
+        // CANCEL
+        // =================================================
+
+        document
+            .getElementById(
+                "cancelEditButton"
+            )
+            .onclick =
+                function () {
+
+                    modal.remove();
+
+                };
+
+
+        // =================================================
+        // SAVE
+        // =================================================
+
+        document
+            .getElementById(
+                "saveEditButton"
+            )
+            .onclick =
+                async function () {
+
+                    await saveEditedProduct(
+                        productId,
+                        product,
+                        modal
+                    );
+
+                };
+
+    };
+
+
+// =====================================================
+// SAVE EDITED PRODUCT
+// =====================================================
+
+async function saveEditedProduct(
+    productId,
+    oldProduct,
+    modal
+) {
+
+    const name =
+        document
+            .getElementById(
+                "editProductName"
+            )
+            ?.value
+            .trim();
+
+
+    const price =
+        document
+            .getElementById(
+                "editProductPrice"
+            )
+            ?.value
+            .trim();
+
+
+    const category =
+        document
+            .getElementById(
+                "editProductCategory"
+            )
+            ?.value
+            .trim();
+
+
+    const imageInput =
+        document.getElementById(
+            "editProductImage"
+        );
+
+
+    const newImage =
+        imageInput?.files?.[0];
+
+
+    // =================================================
+    // VALIDATION
+    // =================================================
+
+    if (!name) {
+
+        alert(
+            "Please enter product name."
+        );
+
+        return;
+    }
+
+
+    if (
+        !price ||
+        isNaN(Number(price)) ||
+        Number(price) <= 0
+    ) {
+
+        alert(
+            "Please enter a valid price."
+        );
+
+        return;
+    }
+
+
+    if (newImage) {
+
+        if (
+            !newImage.type.startsWith(
+                "image/"
+            )
+        ) {
+
+            alert(
+                "Please select a valid image."
+            );
+
+            return;
+        }
+
+
+        if (
+            newImage.size >
+            5 * 1024 * 1024
+        ) {
+
+            alert(
+                "Image must be less than 5 MB."
+            );
+
+            return;
+        }
+
+    }
+
+
+    const saveButton =
+        document.getElementById(
+            "saveEditButton"
+        );
+
+
+    try {
+
+        if (saveButton) {
+
+            saveButton.disabled = true;
+
+            saveButton.innerText =
+                newImage
+                    ? "Uploading Image..."
+                    : "Saving...";
+
+        }
+
+
+        // =================================================
+        // IMAGE
+        // =================================================
+
+        let imageURL =
+            oldProduct.image || "";
+
+
+        if (newImage) {
+
+            imageURL =
+                await uploadToCloudinary(
+                    newImage
+                );
+
+        }
+
+
+        if (saveButton) {
+
+            saveButton.innerText =
+                "Updating Firebase...";
+
+        }
+
+
+        // =================================================
+        // FIRESTORE UPDATE
+        // =================================================
+
+        const productRef =
+            doc(
+                db,
+                "products",
+                productId
+            );
+
+
+        await updateDoc(
+            productRef,
+            {
+
+                name: name,
+
+                price: Number(price),
+
+                category: category,
+
+                image: imageURL,
+
+                updatedAt: new Date()
+
+            }
+        );
+
+
+        console.log(
+            "✅ Product updated:",
+            productId
+        );
+
+
+        modal.remove();
+
+
+        alert(
+            "Product updated successfully! ✅"
+        );
+
+
+        // =================================================
+        // RELOAD
+        // =================================================
+
+        await loadProducts();
+
+    }
+    catch (error) {
+
+        console.error(
+            "❌ EDIT PRODUCT ERROR:",
+            error
+        );
+
+
+        alert(
+            "Product update failed:\n\n" +
+            error.message
+        );
+
+
+        if (saveButton) {
+
+            saveButton.disabled = false;
+
+            saveButton.innerText =
+                "💾 Save Changes";
+
+        }
 
     }
 
@@ -920,7 +1433,6 @@ function escapeHTML(value) {
     ) {
 
         return "";
-
     }
 
 
@@ -950,5 +1462,16 @@ function escapeHTML(value) {
             /'/g,
             "&#039;"
         );
+
+}
+
+
+// =====================================================
+// ESCAPE ATTRIBUTE
+// =====================================================
+
+function escapeAttribute(value) {
+
+    return escapeHTML(value);
 
 }
