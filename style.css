@@ -356,3 +356,50 @@ nav{
     }
 
 }
+.camera-hero .camera-overlay {
+    position: absolute !important;
+    inset: 0 !important;
+
+    width: 100% !important;
+    height: 100% !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    text-align: center !important;
+    color: white !important;
+
+    z-index: 999 !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+.camera-hero .camera-overlay h1,
+.camera-hero .camera-overlay p,
+.camera-hero .camera-overlay .hero-btn {
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+.camera-hero .camera-overlay h1 {
+    color: white !important;
+    font-size: 38px !important;
+    margin: 0 0 10px !important;
+}
+
+.camera-hero .camera-overlay p {
+    color: white !important;
+    font-size: 18px !important;
+    margin: 0 0 22px !important;
+}
+
+.camera-hero .camera-overlay .hero-btn {
+    display: inline-block !important;
+    background: #111 !important;
+    color: white !important;
+    padding: 12px 24px !important;
+    border-radius: 6px !important;
+    text-decoration: none !important;
+}
