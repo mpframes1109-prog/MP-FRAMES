@@ -12,7 +12,7 @@ import {
 
 const CLOUDINARY_CLOUD_NAME = "dqavm3wk";
 
-const CLOUDINARY_UPLOAD_PRESET = "mp_frames";
+const CLOUDINARY_UPLOAD_PRESET = "mpframes";
 
 
 // ======================================================
