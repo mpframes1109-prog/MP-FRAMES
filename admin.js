@@ -47,7 +47,7 @@ const CLOUDINARY_UPLOAD_PRESET = "mpframes";
 // Different possible IDs are supported
 
 const productList =
-    document.getElementById("product-list") ||
+    document.getElementById("productslist") ||
     document.getElementById("productsList") ||
     document.getElementById("productList");
 
