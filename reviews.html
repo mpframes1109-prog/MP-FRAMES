@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Customer Reviews - MP Frames</title>
+
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
+
+    <style>
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f6f6f6;
+            color: #111;
+        }
+
+
+        /* =========================
+           HEADER
+        ========================= */
+
+        header {
+            background: #111;
+            color: white;
+            padding: 18px 30px;
+        }
+
+
+        .header-content {
+            max-width: 1200px;
+            margin: auto;
+
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            gap: 20px;
+        }
+
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+
+        nav {
+            display: flex;
+            gap: 22px;
+            align-items: center;
+        }
+
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+
+        nav a:hover {
+            opacity: .7;
+        }
+
+
+        /* =========================
+           PAGE
+        ========================= */
+
+        .reviews-container {
+
+            width: 92%;
+            max-width: 1100px;
+
+            margin: 45px auto;
+        }
+
+
+        .reviews-heading {
+            text-align: center;
+            margin-bottom: 35px;
+        }
+
+
+        .reviews-heading h1 {
+            font-size: 36px;
+            margin-bottom: 10px;
+        }
+
+
+        .reviews-heading p {
+            color: #666;
+            font-size: 17px;
+        }
+
+
+        /* =========================
+           RATING SUMMARY
+        ========================= */
+
+        .rating-summary {
+
+            background: white;
+
+            border-radius: 15px;
+
+            padding: 30px;
+
+            text-align: center;
+
+            box-shadow:
+                0 5px 20px
+                rgba(0,0,0,.08);
+
+            margin-bottom: 35px;
+        }
+
+
+        .rating-number {
+
+            font-size: 45px;
+
+            font-weight: bold;
+
+            margin-bottom: 5px;
+        }
+
+
+        .rating-stars {
+
+            color: #ffb300;
+
+            font-size: 28px;
+
+            margin-bottom: 8px;
+        }
+
+
+        #reviewCount {
+
+            color: #777;
+
+            font-size: 14px;
+        }
+
+
+        /* =========================
+           REVIEWS GRID
+        ========================= */
+
+        #customerReviews {
+
+            display: grid;
+
+            grid-template-columns:
+                repeat(
+                    auto-fit,
+                    minmax(280px, 1fr)
+                );
+
+            gap: 22px;
+        }
+
+
+        .review-card {
+
+            background: white;
+
+            padding: 23px;
+
+            border-radius: 14px;
+
+            box-shadow:
+                0 5px 18px
+                rgba(0,0,0,.08);
+
+            transition: .2s;
+        }
+
+
+        .review-card:hover {
+
+            transform:
+                translateY(-4px);
+        }
+
+
+        .review-card-header {
+
+            display: flex;
+
+            justify-content:
+                space-between;
+
+            align-items: center;
+
+            gap: 10px;
+
+            margin-bottom: 8px;
+        }
+
+
+        .customer-name {
+
+            font-size: 18px;
+
+            font-weight: bold;
+        }
+
+
+        .review-stars {
+
+            color: #ffb300;
+
+            font-size: 18px;
+        }
+
+
+        .product-name {
+
+            color: #777;
+
+            font-size: 14px;
+
+            margin-bottom: 12px;
+        }
+
+
+        .review-comment {
+
+            line-height: 1.6;
+
+            color: #333;
+
+            margin-bottom: 15px;
+        }
+
+
+        .review-date {
+
+            font-size: 12px;
+
+            color: #999;
+        }
+
+
+        /* =========================
+           LOADING
+        ========================= */
+
+        .loading {
+
+            grid-column: 1 / -1;
+
+            background: white;
+
+            padding: 35px;
+
+            text-align: center;
+
+            border-radius: 12px;
+
+            color: #777;
+        }
+
+
+        /* =========================
+           MOBILE
+        ========================= */
+
+        @media(max-width:700px) {
+
+            header {
+                padding: 15px;
+            }
+
+
+            .header-content {
+
+                flex-direction: column;
+
+                text-align: center;
+            }
+
+
+            nav {
+
+                flex-wrap: wrap;
+
+                justify-content: center;
+
+                gap: 14px;
+            }
+
+
+            .reviews-container {
+
+                width: 94%;
+
+                margin-top: 30px;
+            }
+
+
+            .reviews-heading h1 {
+
+                font-size: 28px;
+            }
+
+
+            #customerReviews {
+
+                grid-template-columns: 1fr;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <!-- =========================
+         HEADER
+    ========================= -->
+
+    <header>
+
+        <div class="header-content">
+
+            <div class="logo">
+                MP Frames
+            </div>
+
+
+            <nav>
+
+                <a href="index.html">
+                    Home
+                </a>
+
+                <a href="products.html">
+                    Products
+                </a>
+
+                <a href="about.html">
+                    About
+                </a>
+
+                <a href="contact.html">
+                    Contact
+                </a>
+
+                <a href="reviews.html">
+                    Reviews
+                </a>
+
+                <a href="cart.html">
+                    Cart
+                </a>
+
+                <a href="login.html">
+                    Admin
+                </a>
+
+            </nav>
+
+        </div>
+
+    </header>
+
+
+
+    <!-- =========================
+         REVIEWS
+    ========================= -->
+
+    <main class="reviews-container">
+
+
+        <div class="reviews-heading">
+
+            <h1>
+                ⭐ Customer Reviews
+            </h1>
+
+            <p>
+                See what customers say about MP Frames
+            </p>
+
+        </div>
+
+
+
+        <!-- RATING -->
+
+        <div class="rating-summary">
+
+            <div
+                class="rating-number"
+                id="averageRating"
+            >
+                0.0
+            </div>
+
+
+            <div
+                class="rating-stars"
+                id="averageStars"
+            >
+                ☆☆☆☆☆
+            </div>
+
+
+            <div id="reviewCount">
+                0 reviews
+            </div>
+
+        </div>
+
+
+
+        <!-- REVIEW CARDS -->
+
+        <div id="customerReviews">
+
+            <div class="loading">
+                Loading customer reviews...
+            </div>
+
+        </div>
+
+
+    </main>
+
+
+
+    <!-- =========================
+         FIREBASE REVIEWS JS
+    ========================= -->
+
+    <script
+        type="module"
+        src="reviews.js"
+    ></script>
+
+
+</body>
+
+</html>
