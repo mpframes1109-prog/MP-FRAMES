@@ -6,17 +6,26 @@ import {
 } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
 
-// ==========================================
-// RAZORPAY
-// ==========================================
+// ======================================================
+// CLOUDINARY
+// ======================================================
+
+const CLOUDINARY_CLOUD_NAME = "YOUR_CLOUD_NAME";
+
+const CLOUDINARY_UPLOAD_PRESET = "YOUR_UNSIGNED_UPLOAD_PRESET";
+
+
+// ======================================================
+// CART
+// ======================================================
 
 let cart =
     JSON.parse(localStorage.getItem("cart")) || [];
 
 
-// ==========================================
+// ======================================================
 // CALCULATE TOTAL
-// ==========================================
+// ======================================================
 
 let total = 0;
 let itemCount = 0;
@@ -36,9 +45,9 @@ cart.forEach(item => {
 });
 
 
-// ==========================================
+// ======================================================
 // DISPLAY TOTAL
-// ==========================================
+// ======================================================
 
 const totalElement =
     document.getElementById("total");
@@ -62,9 +71,9 @@ if (itemCountElement) {
 }
 
 
-// ==========================================
+// ======================================================
 // CHECK CART
-// ==========================================
+// ======================================================
 
 if (cart.length === 0) {
 
@@ -75,9 +84,103 @@ if (cart.length === 0) {
 }
 
 
-// ==========================================
+// ======================================================
+// UPLOAD IMAGE TO CLOUDINARY
+// ======================================================
+
+async function uploadToCloudinary(file) {
+
+    if (
+        !CLOUDINARY_CLOUD_NAME ||
+        CLOUDINARY_CLOUD_NAME === "YOUR_CLOUD_NAME"
+    ) {
+
+        throw new Error(
+            "Cloudinary Cloud Name is not configured."
+        );
+
+    }
+
+
+    if (
+        !CLOUDINARY_UPLOAD_PRESET ||
+        CLOUDINARY_UPLOAD_PRESET === "YOUR_UNSIGNED_UPLOAD_PRESET"
+    ) {
+
+        throw new Error(
+            "Cloudinary Upload Preset is not configured."
+        );
+
+    }
+
+
+    const url =
+        `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`;
+
+
+    const formData =
+        new FormData();
+
+
+    formData.append(
+        "file",
+        file
+    );
+
+
+    formData.append(
+        "upload_preset",
+        CLOUDINARY_UPLOAD_PRESET
+    );
+
+
+    const response =
+        await fetch(
+            url,
+            {
+                method: "POST",
+                body: formData
+            }
+        );
+
+
+    const data =
+        await response.json();
+
+
+    console.log(
+        "Cloudinary response:",
+        data
+    );
+
+
+    if (!response.ok) {
+
+        throw new Error(
+            data.error?.message ||
+            "Cloudinary upload failed."
+        );
+
+    }
+
+
+    if (!data.secure_url) {
+
+        throw new Error(
+            "Cloudinary image URL was not received."
+        );
+
+    }
+
+
+    return data.secure_url;
+
+}
+
+
+// ======================================================
 // CREATE RAZORPAY ORDER
-// ==========================================
+// ======================================================
 
 async function createRazorpayOrder() {
 
@@ -131,7 +234,7 @@ async function createRazorpayOrder() {
     if (!data.orderId) {
 
         throw new Error(
-            "Razorpay Order ID was not received"
+            "Razorpay Order ID was not received."
         );
 
     }
@@ -140,7 +243,7 @@ async function createRazorpayOrder() {
     if (!data.keyId) {
 
         throw new Error(
-            "Razorpay Key ID was not received"
+            "Razorpay Key ID was not received."
         );
 
     }
@@ -151,17 +254,17 @@ async function createRazorpayOrder() {
 }
 
 
-// ==========================================
+// ======================================================
 // PLACE ORDER
-// ==========================================
+// ======================================================
 
 window.placeOrder =
     async function () {
 
 
-        // ==================================
-        // GET CUSTOMER DETAILS
-        // ==================================
+        // ==================================================
+        // CUSTOMER DETAILS
+        // ==================================================
 
         const name =
             document
@@ -195,9 +298,9 @@ window.placeOrder =
             document.getElementById("photo");
 
 
-        // ==================================
+        // ==================================================
         // VALIDATION
-        // ==================================
+        // ==================================================
 
         if (!name) {
 
@@ -243,9 +346,9 @@ window.placeOrder =
         }
 
 
-        // ==================================
+        // ==================================================
         // PHOTO VALIDATION
-        // ==================================
+        // ==================================================
 
         if (
             !photoInput ||
@@ -267,9 +370,7 @@ window.placeOrder =
 
 
         if (
-            !photoFile.type.startsWith(
-                "image/"
-            )
+            !photoFile.type.startsWith("image/")
         ) {
 
             alert(
@@ -280,6 +381,8 @@ window.placeOrder =
 
         }
 
+
+        // 5 MB maximum
 
         if (
             photoFile.size >
@@ -295,9 +398,9 @@ window.placeOrder =
         }
 
 
-        // ==================================
+        // ==================================================
         // BUTTON
-        // ==================================
+        // ==================================================
 
         const button =
             document.querySelector(
@@ -307,36 +410,45 @@ window.placeOrder =
 
         try {
 
+
             if (button) {
 
                 button.disabled =
                     true;
 
                 button.innerText =
-                    "Opening Payment...";
+                    "Uploading Photo...";
 
             }
 
 
-            // ==================================
-            // IMPORTANT
-            // ==================================
-            // Currently the image itself is NOT
-            // uploaded to Firebase Storage.
-            //
-            // We temporarily keep the image name.
-            //
-            // Cloudinary upload can be connected
-            // later.
-            // ==================================
+            // ==================================================
+            // CLOUDINARY UPLOAD
+            // ==================================================
 
-            const photoName =
-                photoFile.name;
+            const photoURL =
+                await uploadToCloudinary(
+                    photoFile
+                );
 
 
-            // ==================================
+            console.log(
+                "Cloudinary Photo URL:",
+                photoURL
+            );
+
+
+            // ==================================================
             // CREATE RAZORPAY ORDER
-            // ==================================
+            // ==================================================
+
+            if (button) {
+
+                button.innerText =
+                    "Opening Payment...";
+
+            }
+
 
             const razorpayOrder =
                 await createRazorpayOrder();
@@ -348,9 +460,9 @@ window.placeOrder =
             );
 
 
-            // ==================================
+            // ==================================================
             // RAZORPAY OPTIONS
-            // ==================================
+            // ==================================================
 
             const options = {
 
@@ -374,14 +486,15 @@ window.placeOrder =
                     razorpayOrder.orderId,
 
 
-                // ==================================
+                // ==================================================
                 // PAYMENT SUCCESS
-                // ==================================
+                // ==================================================
 
                 handler:
                     async function (
                         paymentResponse
                     ) {
+
 
                         console.log(
                             "Payment response:",
@@ -392,14 +505,14 @@ window.placeOrder =
                         if (button) {
 
                             button.innerText =
-                                "Verifying Payment...";
+                                "Saving Order...";
 
                         }
 
 
-                        // ==================================
-                        // FIRST SAVE ORDER IN FIRESTORE
-                        // ==================================
+                        // ==================================================
+                        // FIRESTORE ORDER IDs
+                        // ==================================================
 
                         const orderDocIds =
                             [];
@@ -407,10 +520,16 @@ window.placeOrder =
 
                         try {
 
+
+                            // ==================================================
+                            // SAVE EACH CART ITEM
+                            // ==================================================
+
                             for (
                                 const item
                                 of cart
                             ) {
+
 
                                 const quantity =
                                     Number(
@@ -424,10 +543,14 @@ window.placeOrder =
                                     ) || 0;
 
 
+                                // ==================================================
+                                // ORDER DATA
+                                // ==================================================
+
                                 const orderData = {
 
-                                    // CUSTOMER
 
+                                    // CUSTOMER
                                     customerName:
                                         name,
 
@@ -439,7 +562,6 @@ window.placeOrder =
 
 
                                     // PRODUCT
-
                                     frameName:
                                         item.name ||
                                         "",
@@ -456,21 +578,24 @@ window.placeOrder =
 
 
                                     // MESSAGE
-
                                     message:
                                         message,
 
 
-                                    // PHOTO
+                                    // ==================================================
+                                    // CLOUDINARY PHOTO
+                                    // ==================================================
 
                                     photo:
-                                        "",
+                                        photoURL,
 
                                     photoName:
-                                        photoName,
+                                        photoFile.name,
 
 
+                                    // ==================================================
                                     // PAYMENT
+                                    // ==================================================
 
                                     paymentStatus:
                                         "Processing",
@@ -487,7 +612,9 @@ window.placeOrder =
                                             .razorpay_order_id,
 
 
+                                    // ==================================================
                                     // ORDER
+                                    // ==================================================
 
                                     status:
                                         "Pending",
@@ -495,11 +622,20 @@ window.placeOrder =
                                     orderTotal:
                                         total,
 
+
+                                    // ==================================================
+                                    // DATE
+                                    // ==================================================
+
                                     createdAt:
                                         new Date()
 
                                 };
 
+
+                                // ==================================================
+                                // FIRESTORE
+                                // ==================================================
 
                                 const docRef =
                                     await addDoc(
@@ -515,18 +651,26 @@ window.placeOrder =
                                     docRef.id
                                 );
 
+
+                                console.log(
+                                    "Order saved:",
+                                    docRef.id
+                                );
+
                             }
 
 
-                            console.log(
-                                "Firestore order IDs:",
-                                orderDocIds
-                            );
-
-
-                            // ==================================
+                            // ==================================================
                             // VERIFY PAYMENT
-                            // ==================================
+                            // ==================================================
+
+                            if (button) {
+
+                                button.innerText =
+                                    "Verifying Payment...";
+
+                            }
+
 
                             const verifyResponse =
                                 await fetch(
@@ -585,15 +729,15 @@ window.placeOrder =
 
                                 throw new Error(
                                     verifyData.error ||
-                                    "Payment verification failed"
+                                    "Payment verification failed."
                                 );
 
                             }
 
 
-                            // ==================================
+                            // ==================================================
                             // WHATSAPP
-                            // ==================================
+                            // ==================================================
 
                             const whatsapp =
 `🛒 MP FRAMES - NEW ORDER
@@ -621,8 +765,8 @@ Order Status: Pending
 Message:
 ${message || "No message"}
 
-Photo:
-${photoName}`;
+Customer Photo:
+${photoURL}`;
 
 
                             window.open(
@@ -637,9 +781,9 @@ ${photoName}`;
                             );
 
 
-                            // ==================================
+                            // ==================================================
                             // CLEAR CART
-                            // ==================================
+                            // ==================================================
 
                             localStorage.removeItem(
                                 "cart"
@@ -651,15 +795,17 @@ ${photoName}`;
                             );
 
 
-                            // ==================================
+                            // ==================================================
                             // HOME
-                            // ==================================
+                            // ==================================================
 
                             window.location.href =
                                 "index.html";
 
+
                         }
                         catch (error) {
+
 
                             console.error(
                                 "After payment error:",
@@ -688,9 +834,9 @@ ${photoName}`;
                     },
 
 
-                // ==================================
-                // PAYMENT FAILED
-                // ==================================
+                // ==================================================
+                // MODAL
+                // ==================================================
 
                 modal: {
 
@@ -698,8 +844,9 @@ ${photoName}`;
                         function () {
 
                             console.log(
-                                "Razorpay checkout closed"
+                                "Razorpay checkout closed."
                             );
+
 
                             if (button) {
 
@@ -716,6 +863,10 @@ ${photoName}`;
                 },
 
 
+                // ==================================================
+                // PREFILL
+                // ==================================================
+
                 prefill: {
 
                     name:
@@ -726,6 +877,10 @@ ${photoName}`;
 
                 },
 
+
+                // ==================================================
+                // NOTES
+                // ==================================================
 
                 notes: {
 
@@ -738,6 +893,10 @@ ${photoName}`;
                 },
 
 
+                // ==================================================
+                // THEME
+                // ==================================================
+
                 theme: {
 
                     color:
@@ -748,9 +907,9 @@ ${photoName}`;
             };
 
 
-            // ==================================
-            // OPEN RAZORPAY
-            // ==================================
+            // ==================================================
+            // CHECK RAZORPAY SDK
+            // ==================================================
 
             if (
                 typeof Razorpay ===
@@ -764,17 +923,26 @@ ${photoName}`;
             }
 
 
+            // ==================================================
+            // OPEN RAZORPAY
+            // ==================================================
+
             const razorpay =
                 new Razorpay(
                     options
                 );
 
 
+            // ==================================================
+            // PAYMENT FAILED
+            // ==================================================
+
             razorpay.on(
                 "payment.failed",
                 function (
                     response
                 ) {
+
 
                     console.error(
                         "Payment failed:",
@@ -786,7 +954,7 @@ ${photoName}`;
                         "Payment failed.\n\n" +
                         (
                             response.error?.description ||
-                            "Something went wrong"
+                            "Something went wrong."
                         )
                     );
 
@@ -811,6 +979,7 @@ ${photoName}`;
         }
         catch (error) {
 
+
             console.error(
                 "Checkout error:",
                 error
@@ -818,7 +987,7 @@ ${photoName}`;
 
 
             alert(
-                "Payment gateway error:\n\n" +
+                "Checkout error:\n\n" +
                 error.message
             );
 
