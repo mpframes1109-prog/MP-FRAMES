@@ -10,9 +10,9 @@ import {
 // CLOUDINARY
 // ======================================================
 
-const CLOUDINARY_CLOUD_NAME = "YOUR_CLOUD_NAME";
+const CLOUDINARY_CLOUD_NAME = "dqavm3wk";
 
-const CLOUDINARY_UPLOAD_PRESET = "YOUR_UNSIGNED_UPLOAD_PRESET";
+const CLOUDINARY_UPLOAD_PRESET = "mp_frames";
 
 
 // ======================================================
