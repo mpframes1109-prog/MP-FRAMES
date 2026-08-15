@@ -189,32 +189,28 @@ nav{
 
 @media (max-width: 600px) {
 
-    /* HEADER */
-    header {
-        padding: 14px 10px;
-        overflow-x: auto;
-    }
-
-    /* NAVBAR */
     nav {
-        display: flex;
-        align-items: center;
-        justify-content: flex-start;
-        gap: 16px;
-
-        flex-wrap: nowrap;
-        white-space: nowrap;
-
-        width: max-content;
-        min-width: 100%;
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 12px 8px;
+        width: 100%;
+        text-align: center;
     }
 
     nav a {
-        display: inline-block;
         white-space: nowrap;
         font-size: 14px;
-        text-decoration: none;
     }
+
+    /* Second row */
+    nav a:nth-child(5) {
+        grid-column: 2;
+    }
+
+    nav a:nth-child(6) {
+        grid-column: 3;
+    }
+}
 
     /* PRODUCT GRID - 2 COLUMNS */
     #product-container,
