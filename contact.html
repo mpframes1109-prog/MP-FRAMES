@@ -1,102 +1,597 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Checkout - MP Frames</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<link rel="stylesheet" href="style.css">
+    <title>Contact - MP Frames</title>
 
-<style>
-.checkout{
-    max-width:600px;
-    margin:40px auto;
-    background:#fff;
-    padding:20px;
-    border-radius:10px;
-    box-shadow:0 0 10px rgba(0,0,0,.2);
-}
+    <style>
+        * {
+            box-sizing: border-box;
+        }
 
-.checkout input,
-.checkout textarea{
-    width:100%;
-    padding:12px;
-    margin:10px 0;
-    border:1px solid #ccc;
-    border-radius:6px;
-}
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+            color: #111;
+        }
 
-.checkout button{
-    width:100%;
-    padding:15px;
-    background:#25D366;
-    color:#fff;
-    border:none;
-    border-radius:6px;
-    font-size:18px;
-    cursor:pointer;
-}
-</style>
+        /* =========================
+           HEADER
+        ========================= */
 
+        header {
+            background: #111;
+            color: white;
+            padding: 18px 25px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 25px;
+        }
+
+        .logo {
+            color: #ffd700;
+            font-size: 26px;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        nav {
+            display: flex;
+            align-items: center;
+            gap: 25px;
+            white-space: nowrap;
+            flex-wrap: nowrap;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        nav a:hover {
+            color: #ffd700;
+        }
+
+        /* =========================
+           CONTACT SECTION
+        ========================= */
+
+        .contact-container {
+            width: 92%;
+            max-width: 1000px;
+            margin: 45px auto;
+        }
+
+        .contact-title {
+            text-align: center;
+            margin-bottom: 35px;
+        }
+
+        .contact-title h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .contact-title p {
+            color: #666;
+            font-size: 16px;
+        }
+
+        .contact-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+        }
+
+        /* =========================
+           CONTACT INFO
+        ========================= */
+
+        .contact-info,
+        .contact-form {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .contact-info h2,
+        .contact-form h2 {
+            margin-top: 0;
+            margin-bottom: 25px;
+        }
+
+        .contact-item {
+            margin-bottom: 22px;
+        }
+
+        .contact-item h3 {
+            margin: 0 0 7px;
+            font-size: 17px;
+        }
+
+        .contact-item p {
+            margin: 0;
+            color: #555;
+            line-height: 1.5;
+        }
+
+        .contact-item a {
+            color: #111;
+            text-decoration: none;
+        }
+
+        .contact-item a:hover {
+            color: #d4a900;
+        }
+
+        /* =========================
+           FORM
+        ========================= */
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 7px;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 13px;
+            border: 1px solid #ccc;
+            border-radius: 7px;
+            font-size: 15px;
+            outline: none;
+            font-family: Arial, sans-serif;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            border-color: #111;
+        }
+
+        .form-group textarea {
+            height: 130px;
+            resize: vertical;
+        }
+
+        .send-btn {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 7px;
+
+            background: #111;
+            color: white;
+
+            font-size: 17px;
+            font-weight: bold;
+
+            cursor: pointer;
+        }
+
+        .send-btn:hover {
+            background: #333;
+        }
+
+        /* =========================
+           WHATSAPP
+        ========================= */
+
+        .whatsapp-btn {
+            display: block;
+            width: 100%;
+            margin-top: 15px;
+
+            padding: 14px;
+
+            background: #25D366;
+            color: white;
+
+            text-align: center;
+            text-decoration: none;
+
+            border-radius: 7px;
+
+            font-size: 17px;
+            font-weight: bold;
+        }
+
+        .whatsapp-btn:hover {
+            background: #1ebe5d;
+        }
+
+        /* =========================
+           FOOTER
+        ========================= */
+
+        footer {
+            margin-top: 60px;
+            background: #111;
+            color: white;
+            text-align: center;
+            padding: 30px 15px;
+        }
+
+        footer p {
+            margin: 0;
+        }
+
+        /* =========================
+           MOBILE
+        ========================= */
+
+        @media (max-width: 600px) {
+
+            header {
+                padding: 15px 10px;
+
+                display: flex;
+                flex-direction: column;
+                align-items: flex-start;
+
+                overflow-x: auto;
+            }
+
+            .logo {
+                font-size: 22px;
+                width: 100%;
+                text-align: center;
+            }
+
+            nav {
+                display: flex;
+                flex-wrap: nowrap;
+                gap: 16px;
+
+                width: max-content;
+                min-width: 100%;
+
+                overflow-x: auto;
+                padding-bottom: 3px;
+            }
+
+            nav a {
+                font-size: 14px;
+                white-space: nowrap;
+                flex-shrink: 0;
+            }
+
+            .contact-container {
+                width: 94%;
+                margin: 30px auto;
+            }
+
+            .contact-title h1 {
+                font-size: 26px;
+            }
+
+            .contact-title p {
+                font-size: 14px;
+            }
+
+            .contact-grid {
+                grid-template-columns: 1fr;
+                gap: 18px;
+            }
+
+            .contact-info,
+            .contact-form {
+                padding: 20px;
+            }
+
+            .contact-info h2,
+            .contact-form h2 {
+                font-size: 21px;
+            }
+
+            footer {
+                margin-top: 35px;
+                font-size: 14px;
+            }
+        }
+    </style>
 </head>
+
 <body>
 
-<div class="checkout">
+    <!-- =========================
+         HEADER
+    ========================= -->
 
-<h2>Checkout</h2>
+    <header>
 
-<input type="text" id="name" placeholder="Full Name">
+        <div class="logo">
+            MP Frames
+        </div>
 
-<input type="tel" id="phone" placeholder="Phone Number">
+        <nav>
 
-<textarea id="address" placeholder="Address"></textarea>
+            <a href="index.html">
+                Home
+            </a>
 
-<button onclick="placeOrder()">
-Place Order on WhatsApp
-</button>
+            <a href="products.html">
+                Products
+            </a>
 
-</div>
+            <a href="about.html">
+                About
+            </a>
 
-<script>
+            <a href="contact.html">
+                Contact
+            </a>
 
-function placeOrder(){
+            <a href="cart.html">
+                Cart
+            </a>
 
-let name=document.getElementById("name").value;
-let phone=document.getElementById("phone").value;
-let address=document.getElementById("address").value;
+            <a href="login.html">
+                Admin
+            </a>
 
-let cart=JSON.parse(localStorage.getItem("cart"))||[];
+        </nav>
 
-if(cart.length==0){
-alert("Your cart is empty.");
-return;
-}
+    </header>
 
-let message="🛒 *New Order - MP Frames*%0A%0A";
 
-message+="👤 Name: "+name+"%0A";
-message+="📞 Phone: "+phone+"%0A";
-message+="📍 Address: "+address+"%0A%0A";
+    <!-- =========================
+         CONTACT
+    ========================= -->
 
-let total=0;
+    <main class="contact-container">
 
-message+="🖼 Products:%0A";
+        <div class="contact-title">
 
-cart.forEach(item=>{
+            <h1>
+                Contact MP Frames
+            </h1>
 
-message+="• "+item.name+" - ₹"+item.price+"%0A";
+            <p>
+                Have a question about our photo frames?
+                Contact us anytime.
+            </p>
 
-total+=item.price;
+        </div>
 
-});
 
-message+="%0A💰 Total: ₹"+total;
+        <div class="contact-grid">
 
-window.open("https://wa.me/8220798492?text="+message,"_blank");
 
-}
+            <!-- CONTACT INFORMATION -->
 
-</script>
+            <div class="contact-info">
+
+                <h2>
+                    Get In Touch
+                </h2>
+
+
+                <div class="contact-item">
+
+                    <h3>
+                        📞 Phone
+                    </h3>
+
+                    <p>
+                        <a href="tel:8220798492">
+                           8220798492
+                        </a>
+                    </p>
+
+                </div>
+
+
+                <div class="contact-item">
+
+                    <h3>
+                        💬 WhatsApp
+                    </h3>
+
+                    <p>
+                        <a
+                            href="https://wa.me/8220798492"
+                            target="_blank"
+                        >
+                            Chat with us on WhatsApp
+                        </a>
+                    </p>
+
+                </div>
+
+
+                <div class="contact-item">
+
+                    <h3>
+                        📍 Address
+                    </h3>
+
+                    <p>
+                        3/101,Bajanai kovil street,<br>
+                        kasavanallathur,<br>
+                        Kadambathur
+                    </p>
+
+                </div>
+
+
+                <div class="contact-item">
+
+                    <h3>
+                        🖼️ Our Service
+                    </h3>
+
+                    <p>
+                        Custom Photo Frames, Collage Frames,
+                        Gift Frames and Wall Frames.
+                    </p>
+
+                </div>
+
+
+                <a
+                    href="https://wa.me/8220798492"
+                    target="_blank"
+                    class="whatsapp-btn"
+                >
+                    💬 WhatsApp Us
+                </a>
+
+            </div>
+
+
+            <!-- CONTACT FORM -->
+
+            <div class="contact-form">
+
+                <h2>
+                    Send Us a Message
+                </h2>
+
+
+                <div class="form-group">
+
+                    <label for="contactName">
+                        Name
+                    </label>
+
+                    <input
+                        type="text"
+                        id="contactName"
+                        placeholder="Enter your name"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="contactPhone">
+                        Phone
+                    </label>
+
+                    <input
+                        type="tel"
+                        id="contactPhone"
+                        placeholder="Enter your phone number"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="contactMessage">
+                        Message
+                    </label>
+
+                    <textarea
+                        id="contactMessage"
+                        placeholder="Type your message..."
+                    ></textarea>
+
+                </div>
+
+
+                <button
+                    type="button"
+                    class="send-btn"
+                    onclick="sendMessage()"
+                >
+                    Send Message
+                </button>
+
+            </div>
+
+        </div>
+
+    </main>
+
+
+    <!-- =========================
+         FOOTER
+    ========================= -->
+
+    <footer>
+
+        <p>
+            © 2026 MP Frames. All Rights Reserved.
+        </p>
+
+    </footer>
+
+
+    <!-- =========================
+         JAVASCRIPT
+    ========================= -->
+
+    <script>
+
+        function sendMessage() {
+
+            const name =
+                document.getElementById("contactName")
+                    .value.trim();
+
+            const phone =
+                document.getElementById("contactPhone")
+                    .value.trim();
+
+            const message =
+                document.getElementById("contactMessage")
+                    .value.trim();
+
+
+            if (!name || !phone || !message) {
+
+                alert(
+                    "Please fill Name, Phone and Message."
+                );
+
+                return;
+            }
+
+
+            const whatsappMessage =
+`Hello MP Frames 👋
+
+Name: ${name}
+
+Phone: ${phone}
+
+Message:
+${message}`;
+
+
+            const whatsappURL =
+                "https://wa.me/8220798492?text=" +
+                encodeURIComponent(
+                    whatsappMessage
+                );
+
+
+            window.open(
+                whatsappURL,
+                "_blank"
+            );
+
+        }
+
+    </script>
 
 </body>
+
 </html>
