@@ -270,13 +270,13 @@ nav{
         min-width: 0;
         font-size: 14px;
     }
-
 .camera-hero {
     position: relative;
     width: 100%;
-    height: 380px;
+    aspect-ratio: 16 / 9;
+    max-width: 100%;
     overflow: hidden;
-    background: #111;
+    background: #000;
 }
 
 .camera-video {
@@ -296,19 +296,26 @@ nav{
     position: absolute;
     inset: 0;
 
-    z-index: 2;
+    z-index: 10;
 
     display: flex;
     flex-direction: column;
-
     align-items: center;
     justify-content: center;
 
     text-align: center;
 
-    background: rgba(0, 0, 0, 0.28);
-
     color: white;
+    background: rgba(0, 0, 0, 0.20);
+
+    pointer-events: none;
+}
+
+.camera-overlay h1,
+.camera-overlay p,
+.camera-overlay .hero-btn {
+    position: relative;
+    z-index: 11;
 }
 
 .camera-overlay h1 {
@@ -322,23 +329,19 @@ nav{
 }
 
 .hero-btn {
-    display: inline-block;
+    pointer-events: auto;
 
+    display: inline-block;
     padding: 12px 24px;
 
     background: #111;
     color: white;
 
     text-decoration: none;
-
     border-radius: 6px;
-
     font-weight: bold;
 }
 
-.hero-btn:hover {
-    background: #333;
-}
 @media (max-width: 600px) {
 
     .camera-hero {
