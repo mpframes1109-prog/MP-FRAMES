@@ -270,136 +270,205 @@ nav{
         min-width: 0;
         font-size: 14px;
     }
+/* =========================================
+   CAMERA HERO
+========================================= */
+
 .camera-hero {
     position: relative;
+
     width: 100%;
-    aspect-ratio: 16 / 9;
     max-width: 100%;
+
+    aspect-ratio: 16 / 9;
+
     overflow: hidden;
+
     background: #000;
 }
 
+
+/* =========================================
+   CAMERA VIDEO
+========================================= */
+
 .camera-video {
     position: absolute;
-    inset: 0;
+
+    top: 0;
+    left: 0;
 
     width: 100%;
     height: 100%;
 
+    max-width: 100%;
+
     object-fit: cover;
     object-position: center;
+
+    display: block;
 
     z-index: 1;
 }
 
+
+/* =========================================
+   TEXT OVER VIDEO
+========================================= */
+
 .camera-overlay {
     position: absolute;
-    inset: 0;
+
+    top: 0;
+    left: 0;
+
+    width: 100%;
+    height: 100%;
 
     z-index: 10;
 
     display: flex;
     flex-direction: column;
+
     align-items: center;
     justify-content: center;
 
     text-align: center;
 
-    color: white;
+    padding: 20px;
+
+    color: #fff;
+
     background: rgba(0, 0, 0, 0.20);
+
+    visibility: visible;
+    opacity: 1;
 
     pointer-events: none;
 }
 
-.camera-overlay h1,
-.camera-overlay p,
-.camera-overlay .hero-btn {
-    position: relative;
-    z-index: 11;
-}
+
+/* =========================================
+   TITLE
+========================================= */
 
 .camera-overlay h1 {
-    font-size: 38px;
+    display: block;
+
     margin: 0 0 10px;
+
+    color: #fff;
+
+    font-size: 38px;
+    font-weight: 700;
+
+    line-height: 1.2;
+
+    text-shadow:
+        0 2px 8px rgba(0, 0, 0, 0.75);
+
+    visibility: visible;
+    opacity: 1;
 }
+
+
+/* =========================================
+   DESCRIPTION
+========================================= */
 
 .camera-overlay p {
-    font-size: 18px;
+    display: block;
+
     margin: 0 0 22px;
+
+    color: #fff;
+
+    font-size: 18px;
+    line-height: 1.5;
+
+    text-shadow:
+        0 2px 6px rgba(0, 0, 0, 0.75);
+
+    visibility: visible;
+    opacity: 1;
 }
 
-.hero-btn {
-    pointer-events: auto;
 
+/* =========================================
+   EXPLORE BUTTON
+========================================= */
+
+.camera-overlay .hero-btn {
     display: inline-block;
+
     padding: 12px 24px;
 
     background: #111;
-    color: white;
+    color: #fff;
+
+    border-radius: 6px;
 
     text-decoration: none;
-    border-radius: 6px;
-    font-weight: bold;
+
+    font-size: 16px;
+    font-weight: 700;
+
+    visibility: visible;
+    opacity: 1;
+
+    pointer-events: auto;
+
+    transition: 0.3s ease;
 }
+
+.camera-overlay .hero-btn:hover {
+    background: #333;
+
+    transform: translateY(-2px);
+}
+
+
+/* =========================================
+   MOBILE
+========================================= */
 
 @media (max-width: 600px) {
 
     .camera-hero {
         aspect-ratio: 16 / 9;
+
+        width: 100%;
+        max-width: 100%;
     }
 
     .camera-video {
         width: 100%;
         height: 100%;
+
         object-fit: cover;
         object-position: center;
     }
 
-}
-.camera-hero .camera-overlay {
-    position: absolute !important;
-    inset: 0 !important;
+    .camera-overlay {
+        padding: 15px;
+    }
 
-    width: 100% !important;
-    height: 100% !important;
+    .camera-overlay h1 {
+        font-size: 27px;
 
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    justify-content: center !important;
+        margin-bottom: 8px;
+    }
 
-    text-align: center !important;
-    color: white !important;
+    .camera-overlay p {
+        font-size: 15px;
 
-    z-index: 999 !important;
-    visibility: visible !important;
-    opacity: 1 !important;
-}
+        margin-bottom: 18px;
+    }
 
-.camera-hero .camera-overlay h1,
-.camera-hero .camera-overlay p,
-.camera-hero .camera-overlay .hero-btn {
-    visibility: visible !important;
-    opacity: 1 !important;
-}
+    .camera-overlay .hero-btn {
+        padding: 10px 20px;
 
-.camera-hero .camera-overlay h1 {
-    color: white !important;
-    font-size: 38px !important;
-    margin: 0 0 10px !important;
-}
+        font-size: 14px;
+    }
 
-.camera-hero .camera-overlay p {
-    color: white !important;
-    font-size: 18px !important;
-    margin: 0 0 22px !important;
-}
-
-.camera-hero .camera-overlay .hero-btn {
-    display: inline-block !important;
-    background: #111 !important;
-    color: white !important;
-    padding: 12px 24px !important;
-    border-radius: 6px !important;
-    text-decoration: none !important;
 }
