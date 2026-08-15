@@ -11,14 +11,12 @@ import {
     addDoc,
     getDocs,
     deleteDoc,
-    doc,
-    orderBy,
-    query
+    doc
 } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
 
 // =====================================================
-// FIREBASE AUTH
+// AUTH
 // =====================================================
 
 const auth = getAuth(app);
@@ -41,18 +39,6 @@ const CLOUDINARY_UPLOAD_PRESET = "mpframes";
 
 
 // =====================================================
-// DOM
-// =====================================================
-
-// Different possible IDs are supported
-
-const productList =
-    document.getElementById("productslist") ||
-    document.getElementById("productsList") ||
-    document.getElementById("productList");
-
-
-// =====================================================
 // AUTH CHECK
 // =====================================================
 
@@ -62,7 +48,20 @@ onAuthStateChanged(auth, async (user) => {
 
     if (!user) {
 
-        console.log("No admin logged in.");
+        window.location.href = "login.html";
+
+        return;
+    }
+
+
+    console.log("Logged in UID:", user.uid);
+
+
+    if (user.uid !== ADMIN_UID) {
+
+        alert("This account is not authorized as admin.");
+
+        await signOut(auth);
 
         window.location.href = "login.html";
 
@@ -70,33 +69,8 @@ onAuthStateChanged(auth, async (user) => {
     }
 
 
-    console.log(
-        "Logged in UID:",
-        user.uid
-    );
+    console.log("✅ Admin verified");
 
-
-    if (user.uid !== ADMIN_UID) {
-
-        alert(
-            "This account is not authorized as admin."
-        );
-
-        await signOut(auth);
-
-        window.location.href =
-            "login.html";
-
-        return;
-    }
-
-
-    console.log(
-        "✅ Admin verified"
-    );
-
-
-    // Load products
 
     await loadProducts();
 
@@ -104,15 +78,12 @@ onAuthStateChanged(auth, async (user) => {
 
 
 // =====================================================
-// CLOUDINARY IMAGE UPLOAD
+// CLOUDINARY UPLOAD
 // =====================================================
 
 async function uploadToCloudinary(file) {
 
-    if (
-        !CLOUDINARY_CLOUD_NAME ||
-        CLOUDINARY_CLOUD_NAME === "YOUR_CLOUD_NAME"
-    ) {
+    if (!CLOUDINARY_CLOUD_NAME) {
 
         throw new Error(
             "Cloudinary Cloud Name is not configured."
@@ -121,11 +92,7 @@ async function uploadToCloudinary(file) {
     }
 
 
-    if (
-        !CLOUDINARY_UPLOAD_PRESET ||
-        CLOUDINARY_UPLOAD_PRESET ===
-        "YOUR_UNSIGNED_UPLOAD_PRESET"
-    ) {
+    if (!CLOUDINARY_UPLOAD_PRESET) {
 
         throw new Error(
             "Cloudinary Upload Preset is not configured."
@@ -134,12 +101,11 @@ async function uploadToCloudinary(file) {
     }
 
 
-    const uploadURL =
+    const url =
         `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`;
 
 
-    const formData =
-        new FormData();
+    const formData = new FormData();
 
 
     formData.append(
@@ -161,7 +127,7 @@ async function uploadToCloudinary(file) {
 
     const response =
         await fetch(
-            uploadURL,
+            url,
             {
                 method: "POST",
                 body: formData
@@ -196,12 +162,6 @@ async function uploadToCloudinary(file) {
         );
 
     }
-
-
-    console.log(
-        "✅ Cloudinary URL:",
-        data.secure_url
-    );
 
 
     return data.secure_url;
@@ -244,26 +204,13 @@ window.addProduct = async function () {
         imageInput?.files?.[0];
 
 
-    console.log(
-        "Product details:",
-        {
-            name,
-            price,
-            category,
-            imageFile
-        }
-    );
-
-
     // =================================================
     // VALIDATION
     // =================================================
 
     if (!name) {
 
-        alert(
-            "Please enter product name."
-        );
+        alert("Please enter product name.");
 
         nameInput?.focus();
 
@@ -273,9 +220,7 @@ window.addProduct = async function () {
 
     if (!price) {
 
-        alert(
-            "Please enter product price."
-        );
+        alert("Please enter product price.");
 
         priceInput?.focus();
 
@@ -288,11 +233,7 @@ window.addProduct = async function () {
         Number(price) <= 0
     ) {
 
-        alert(
-            "Please enter a valid price."
-        );
-
-        priceInput?.focus();
+        alert("Please enter a valid price.");
 
         return;
     }
@@ -300,11 +241,7 @@ window.addProduct = async function () {
 
     if (!imageFile) {
 
-        alert(
-            "Please select a product image."
-        );
-
-        imageInput?.focus();
+        alert("Please select a product image.");
 
         return;
     }
@@ -314,9 +251,7 @@ window.addProduct = async function () {
         !imageFile.type.startsWith("image/")
     ) {
 
-        alert(
-            "Please select a valid image."
-        );
+        alert("Please select a valid image.");
 
         return;
     }
@@ -348,8 +283,7 @@ window.addProduct = async function () {
 
         if (button) {
 
-            button.disabled =
-                true;
+            button.disabled = true;
 
             button.innerText =
                 "Uploading Image...";
@@ -368,7 +302,7 @@ window.addProduct = async function () {
 
 
         console.log(
-            "Image URL:",
+            "Cloudinary URL:",
             imageURL
         );
 
@@ -387,28 +321,17 @@ window.addProduct = async function () {
 
         const productData = {
 
-            name:
-                name,
+            name: name,
 
-            price:
-                Number(price),
+            price: Number(price),
 
-            category:
-                category,
+            category: category,
 
-            image:
-                imageURL,
+            image: imageURL,
 
-            createdAt:
-                new Date()
+            createdAt: new Date()
 
         };
-
-
-        console.log(
-            "Saving product:",
-            productData
-        );
 
 
         const docRef =
@@ -432,30 +355,19 @@ window.addProduct = async function () {
         // =================================================
 
         if (nameInput) {
-
             nameInput.value = "";
-
         }
-
 
         if (priceInput) {
-
             priceInput.value = "";
-
         }
-
 
         if (categoryInput) {
-
             categoryInput.value = "";
-
         }
 
-
         if (imageInput) {
-
             imageInput.value = "";
-
         }
 
 
@@ -465,17 +377,16 @@ window.addProduct = async function () {
 
 
         // =================================================
-        // RELOAD PRODUCTS
+        // RELOAD
         // =================================================
 
         await loadProducts();
-
 
     }
     catch (error) {
 
         console.error(
-            "ADD PRODUCT ERROR:",
+            "❌ ADD PRODUCT ERROR:",
             error
         );
 
@@ -490,8 +401,7 @@ window.addProduct = async function () {
 
         if (button) {
 
-            button.disabled =
-                false;
+            button.disabled = false;
 
             button.innerText =
                 "Add Product";
@@ -509,16 +419,19 @@ window.addProduct = async function () {
 
 async function loadProducts() {
 
+    // IMPORTANT:
+    // Your HTML uses products-List
+
     const list =
-        document.getElementById("product-list") ||
-        document.getElementById("productsList") ||
-        document.getElementById("productList");
+        document.getElementById(
+            "products-List"
+        );
 
 
     if (!list) {
 
         console.error(
-            "❌ Product list element not found."
+            "❌ products-List not found in HTML"
         );
 
         return;
@@ -531,7 +444,9 @@ async function loadProducts() {
             text-align:center;
             padding:30px;
         ">
+
             Loading Products...
+
         </div>
 
     `;
@@ -540,9 +455,22 @@ async function loadProducts() {
     try {
 
         console.log(
-            "Loading products from Firestore..."
+            "================================="
         );
 
+        console.log(
+            "Loading products..."
+        );
+
+        console.log(
+            "Firebase DB:",
+            db
+        );
+
+
+        // =================================================
+        // GET PRODUCTS
+        // =================================================
 
         const productsRef =
             collection(
@@ -551,47 +479,14 @@ async function loadProducts() {
             );
 
 
-        let snapshot;
-
-
-        // Try ordered query first
-
-        try {
-
-            const productsQuery =
-                query(
-                    productsRef,
-                    orderBy(
-                        "createdAt",
-                        "desc"
-                    )
-                );
-
-
-            snapshot =
-                await getDocs(
-                    productsQuery
-                );
-
-        }
-        catch (orderError) {
-
-            console.warn(
-                "OrderBy failed, loading without order:",
-                orderError
+        const snapshot =
+            await getDocs(
+                productsRef
             );
 
 
-            snapshot =
-                await getDocs(
-                    productsRef
-                );
-
-        }
-
-
         console.log(
-            "Products found:",
+            "🔥 Products found:",
             snapshot.size
         );
 
@@ -607,9 +502,17 @@ async function loadProducts() {
                 <div style="
                     text-align:center;
                     padding:30px;
-                    color:#666;
+                    color:#777;
                 ">
-                    No Products Found
+
+                    <h3>
+                        No Products Found
+                    </h3>
+
+                    <p>
+                        Firestore products collection is empty.
+                    </p>
+
                 </div>
 
             `;
@@ -626,227 +529,247 @@ async function loadProducts() {
 
 
         // =================================================
-        // DISPLAY
+        // DISPLAY PRODUCTS
         // =================================================
 
-        snapshot.forEach((productDoc) => {
+        snapshot.forEach(
+            (productDoc) => {
 
-            const product =
-                productDoc.data();
-
-
-            console.log(
-                "Product:",
-                product
-            );
+                const product =
+                    productDoc.data();
 
 
-            const card =
-                document.createElement(
-                    "div"
+                console.log(
+                    "PRODUCT:",
+                    productDoc.id,
+                    product
                 );
 
 
-            card.className =
-                "admin-product-card";
-
-
-            card.style.cssText = `
-
-                background:#fff;
-                border-radius:12px;
-                padding:15px;
-                margin:10px;
-                box-shadow:
-                    0 3px 15px
-                    rgba(0,0,0,.10);
-
-                text-align:center;
-
-            `;
-
-
-            // =================================================
-            // IMAGE
-            // =================================================
-
-            const image =
-                document.createElement(
-                    "img"
-                );
-
-
-            image.src =
-                product.image || "";
-
-
-            image.alt =
-                product.name ||
-                "Product";
-
-
-            image.style.cssText = `
-
-                width:180px;
-                height:180px;
-                object-fit:cover;
-                border-radius:10px;
-
-                display:block;
-                margin:0 auto 12px;
-
-            `;
-
-
-            image.onerror =
-                function () {
-
-                    this.style.display =
-                        "none";
-
-                };
-
-
-            // =================================================
-            // NAME
-            // =================================================
-
-            const title =
-                document.createElement(
-                    "h3"
-                );
-
-
-            title.innerText =
-                product.name ||
-                "Unnamed Product";
-
-
-            // =================================================
-            // PRICE
-            // =================================================
-
-            const price =
-                document.createElement(
-                    "p"
-                );
-
-
-            price.innerText =
-                `₹${Number(
-                    product.price || 0
-                ).toFixed(2)}`;
-
-
-            price.style.cssText = `
-
-                font-weight:bold;
-                font-size:18px;
-
-            `;
-
-
-            // =================================================
-            // CATEGORY
-            // =================================================
-
-            const category =
-                document.createElement(
-                    "p"
-                );
-
-
-            category.innerText =
-                product.category ||
-                "No Category";
-
-
-            category.style.cssText = `
-
-                color:#666;
-
-            `;
-
-
-            // =================================================
-            // DELETE
-            // =================================================
-
-            const deleteButton =
-                document.createElement(
-                    "button"
-                );
-
-
-            deleteButton.innerText =
-                "Delete";
-
-
-            deleteButton.style.cssText = `
-
-                background:#d32f2f;
-                color:white;
-
-                border:none;
-                border-radius:6px;
-
-                padding:10px 20px;
-
-                cursor:pointer;
-
-                font-weight:bold;
-
-            `;
-
-
-            deleteButton.onclick =
-                async function () {
-
-                    await deleteProduct(
-                        productDoc.id
+                const card =
+                    document.createElement(
+                        "div"
                     );
 
-                };
+
+                card.className =
+                    "admin-product-card";
 
 
-            // =================================================
-            // APPEND
-            // =================================================
+                card.style.cssText = `
 
-            card.appendChild(
-                image
-            );
+                    background:#fff;
 
+                    border-radius:12px;
 
-            card.appendChild(
-                title
-            );
+                    padding:15px;
 
+                    margin:10px;
 
-            card.appendChild(
-                price
-            );
+                    box-shadow:
+                        0 4px 15px
+                        rgba(0,0,0,.10);
 
+                    text-align:center;
 
-            card.appendChild(
-                category
-            );
+                `;
 
 
-            card.appendChild(
-                deleteButton
-            );
+                // =================================================
+                // IMAGE
+                // =================================================
+
+                const image =
+                    document.createElement(
+                        "img"
+                    );
 
 
-            list.appendChild(
-                card
-            );
+                image.src =
+                    product.image || "";
 
-        });
+
+                image.alt =
+                    product.name ||
+                    "Product";
+
+
+                image.style.cssText = `
+
+                    width:180px;
+
+                    height:180px;
+
+                    object-fit:cover;
+
+                    border-radius:10px;
+
+                    display:block;
+
+                    margin:0 auto 15px;
+
+                `;
+
+
+                image.onerror =
+                    function () {
+
+                        this.alt =
+                            "Image unavailable";
+
+                    };
+
+
+                // =================================================
+                // NAME
+                // =================================================
+
+                const title =
+                    document.createElement(
+                        "h3"
+                    );
+
+
+                title.innerText =
+                    product.name ||
+                    "Unnamed Product";
+
+
+                // =================================================
+                // PRICE
+                // =================================================
+
+                const price =
+                    document.createElement(
+                        "p"
+                    );
+
+
+                price.innerText =
+                    `₹${Number(
+                        product.price || 0
+                    ).toFixed(2)}`;
+
+
+                price.style.cssText = `
+
+                    font-size:18px;
+
+                    font-weight:bold;
+
+                    margin:8px;
+
+                `;
+
+
+                // =================================================
+                // CATEGORY
+                // =================================================
+
+                const category =
+                    document.createElement(
+                        "p"
+                    );
+
+
+                category.innerText =
+                    product.category ||
+                    "No Category";
+
+
+                category.style.cssText = `
+
+                    color:#666;
+
+                    margin:5px;
+
+                `;
+
+
+                // =================================================
+                // DELETE BUTTON
+                // =================================================
+
+                const deleteButton =
+                    document.createElement(
+                        "button"
+                    );
+
+
+                deleteButton.innerText =
+                    "Delete";
+
+
+                deleteButton.style.cssText = `
+
+                    background:#d32f2f;
+
+                    color:white;
+
+                    border:none;
+
+                    border-radius:6px;
+
+                    padding:10px 20px;
+
+                    cursor:pointer;
+
+                    font-weight:bold;
+
+                    margin-top:10px;
+
+                `;
+
+
+                deleteButton.onclick =
+                    async function () {
+
+                        await deleteProduct(
+                            productDoc.id
+                        );
+
+                    };
+
+
+                // =================================================
+                // APPEND
+                // =================================================
+
+                card.appendChild(
+                    image
+                );
+
+
+                card.appendChild(
+                    title
+                );
+
+
+                card.appendChild(
+                    price
+                );
+
+
+                card.appendChild(
+                    category
+                );
+
+
+                card.appendChild(
+                    deleteButton
+                );
+
+
+                list.appendChild(
+                    card
+                );
+
+            }
+        );
 
 
         console.log(
-            "✅ Products displayed"
+            "✅ All products displayed"
         );
 
     }
@@ -866,15 +789,15 @@ async function loadProducts() {
                 padding:30px;
             ">
 
-                <strong>
-                    ❌ Error loading products
-                </strong>
+                <h3>
+                    ❌ Error Loading Products
+                </h3>
 
-                <br><br>
-
-                ${escapeHTML(
-                    error.message
-                )}
+                <p>
+                    ${escapeHTML(
+                        error.message
+                    )}
+                </p>
 
             </div>
 
@@ -889,61 +812,60 @@ async function loadProducts() {
 // DELETE PRODUCT
 // =====================================================
 
-async function deleteProduct(id) {
+window.deleteProduct =
+    async function (id) {
 
-    if (!id) {
-
-        return;
-    }
-
-
-    const confirmDelete =
-        confirm(
-            "Are you sure you want to delete this product?"
-        );
+        if (!id) {
+            return;
+        }
 
 
-    if (!confirmDelete) {
-
-        return;
-    }
-
-
-    try {
-
-        await deleteDoc(
-            doc(
-                db,
-                "products",
-                id
-            )
-        );
+        const confirmDelete =
+            confirm(
+                "Are you sure you want to delete this product?"
+            );
 
 
-        alert(
-            "Product deleted successfully! ✅"
-        );
+        if (!confirmDelete) {
+            return;
+        }
 
 
-        await loadProducts();
+        try {
 
-    }
-    catch (error) {
+            await deleteDoc(
+                doc(
+                    db,
+                    "products",
+                    id
+                )
+            );
 
-        console.error(
-            "Delete error:",
-            error
-        );
+
+            alert(
+                "Product deleted successfully! ✅"
+            );
 
 
-        alert(
-            "Delete failed:\n\n" +
-            error.message
-        );
+            await loadProducts();
 
-    }
+        }
+        catch (error) {
 
-}
+            console.error(
+                "Delete error:",
+                error
+            );
+
+
+            alert(
+                "Delete failed:\n\n" +
+                error.message
+            );
+
+        }
+
+    };
 
 
 // =====================================================
