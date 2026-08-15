@@ -192,17 +192,17 @@ nav{
     nav {
         display: grid;
         grid-template-columns: repeat(4, 1fr);
-        gap: 12px 8px;
+        gap: 14px 8px;
         width: 100%;
         text-align: center;
     }
 
     nav a {
         white-space: nowrap;
-        font-size: 14px;
+        font-size: 16px;   /* slightly bigger */
+        font-weight: 600;
     }
 
-    /* Second row */
     nav a:nth-child(5) {
         grid-column: 2;
     }
