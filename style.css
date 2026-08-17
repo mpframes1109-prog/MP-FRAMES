@@ -966,3 +966,52 @@ footer {
         cursor: pointer;
     }
 }
+/* =================================
+   INNER PAGE BACK BUTTON
+================================= */
+
+.inner-back-btn {
+    display: block;
+
+    margin: 18px 0 0 20px;
+
+    width: 58px;
+    height: 58px;
+
+    border: none;
+    border-radius: 50%;
+
+    background: #111;
+    color: white;
+
+    font-size: 32px;
+    font-weight: bold;
+
+    cursor: pointer;
+
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+
+    transition: 0.2s;
+}
+
+.inner-back-btn:hover {
+    background: #333;
+    transform: translateX(-3px);
+}
+
+
+/* MOBILE */
+
+@media (max-width: 700px) {
+
+    .inner-back-btn {
+
+        width: 58px;
+        height: 58px;
+
+        margin: 15px 0 0 18px;
+
+        font-size: 32px;
+    }
+
+}
