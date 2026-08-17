@@ -907,111 +907,104 @@ footer {
         font-size: 14px;
     }
 
+/* -------------------------
+   HERO
+------------------------- */
 
-    /* -------------------------
-       HERO
-    ------------------------- */
-
-    .hero {
-
-        height: 75vh;
-
-        padding: 20px;
-    }
-
-
-    .hero h1 {
-
-        font-size: 32px;
-    }
-
-
-    .hero p {
-
-        font-size: 16px;
-    }
-
-}
-.mobile-back-btn {
-    display: none;
-}
-/* ================================
-   MOBILE BACK BUTTON
-================================ */
-
-.page-back-btn {
-    display: none;
-}
-.mobile-back-btn {
-    display: none;
+.hero {
+    height: 75vh;
+    padding: 20px;
 }
 
-@media (max-width: 700px) {
-    .mobile-back-btn {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-
-        width: 55px;
-        height: 55px;
-
-        margin: 12px 0 10px 15px;
-
-        background: #111;
-        color: white;
-        border: none;
-        border-radius: 50%;
-
-        font-size: 32px;
-        cursor: pointer;
-    }
+.hero h1 {
+    font-size: 32px;
 }
+
+.hero p {
+    font-size: 16px;
+}
+
+
 /* =================================
    INNER PAGE BACK BUTTON
+   Header-க்குள் மட்டும்
 ================================= */
 
 .inner-back-btn {
-    display: block;
-
-    margin: 18px 0 0 20px;
-
-    width: 58px;
-    height: 58px;
-
-    border: none;
-    border-radius: 50%;
-
-    background: #111;
-    color: white;
-
-    font-size: 32px;
-    font-weight: bold;
-
-    cursor: pointer;
-
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-
-    transition: 0.2s;
-}
-
-.inner-back-btn:hover {
-    background: #333;
-    transform: translateX(-3px);
+    display: none;
 }
 
 
-/* MOBILE */
+/* =================================
+   MOBILE
+================================= */
 
 @media (max-width: 700px) {
 
+    header {
+        position: relative;
+
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+
+        width: 100%;
+        min-height: 65px;
+
+        padding: 0 15px;
+
+        box-sizing: border-box;
+    }
+
+
+    /* BACK ARROW */
+
     .inner-back-btn {
+        display: flex;
 
-        width: 58px;
-        height: 58px;
+        align-items: center;
+        justify-content: center;
 
-        margin: 15px 0 0 18px;
+        flex-shrink: 0;
 
-        font-size: 32px;
+        width: 45px;
+        height: 45px;
+
+        margin: 0 10px 0 0;
+
+        padding: 0;
+
+        border: none;
+        border-radius: 50%;
+
+        background: transparent;
+        color: white;
+
+        font-size: 34px;
+        font-weight: bold;
+
+        line-height: 1;
+
+        cursor: pointer;
+
+        z-index: 100;
+    }
+
+
+    .inner-back-btn:active {
+        transform: scale(0.9);
+    }
+
+
+    /* LOGO */
+
+    header .logo {
+        flex: 1;
+
+        text-align: center;
+
+        font-size: 24px;
+        font-weight: bold;
     }
 
 }
