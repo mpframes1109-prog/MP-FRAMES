@@ -1,4 +1,4 @@
-* {
+{
     margin: 0;
     padding: 0;
     box-sizing: border-box;
@@ -969,5 +969,44 @@ footer {
 
     .mobile-back-btn:active {
         transform: scale(.92);
+    }
+}
+.page-back-btn {
+    display: none;
+}
+
+@media (max-width: 700px) {
+
+    .page-back-btn {
+        display: flex;
+
+        position: fixed;
+        top: 12px;
+        left: 12px;
+
+        width: 42px;
+        height: 42px;
+
+        align-items: center;
+        justify-content: center;
+
+        background: #111;
+        color: #fff;
+
+        border: none;
+        border-radius: 50%;
+
+        font-size: 26px;
+        font-weight: bold;
+
+        cursor: pointer;
+
+        z-index: 99999;
+
+        box-shadow: 0 3px 10px rgba(0,0,0,0.3);
+    }
+
+    .page-back-btn:active {
+        transform: scale(0.9);
     }
 }
