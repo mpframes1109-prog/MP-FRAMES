@@ -280,7 +280,7 @@ body {
 
         <h2>MP Frames</h2>
 
-        <button onclick="closeMenu()">
+       <button type="button" onclick="closeMenu()">
             ×
         </button>
 
@@ -380,47 +380,31 @@ body {
 
     <script>
 
-        function updateCartCount() {
+function openMenu() {
 
-            const cart =
-                JSON.parse(localStorage.getItem("cart")) || [];
+    const menu =
+        document.getElementById("mobileSidebar");
 
-            let count = 0;
+    if (menu) {
+        menu.classList.add("active");
+    }
 
-            cart.forEach(item => {
-
-                count += Number(item.quantity || 1);
-
-            });
-
-            const cartCount =
-                document.getElementById("cartCount");
-
-            if (cartCount) {
-
-                cartCount.innerText = count;
-
-            }
-
-        }
-
-        <!-- Mobile Menu JavaScript -->
-    <script>
-        function openMenu() {
-            document
-                .getElementById("mobileSidebar")
-                .classList.add("active");
-        }
-
-        function closeMenu() {
-            document
-                .getElementById("mobileSidebar")
-                .classList.remove("active");
-        }
+}
 
 
-        updateCartCount();
+function closeMenu() {
 
+    const menu =
+        document.getElementById("mobileSidebar");
+
+    if (menu) {
+        menu.classList.remove("active");
+    }
+
+}
+
+  
+            
     </script>
 
 </body>
