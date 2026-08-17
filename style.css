@@ -979,3 +979,49 @@ footer {
     }
 
 }
+/* ================================
+   MOBILE BACK BUTTON
+================================ */
+
+.mobile-back-btn {
+    display: none;
+}
+
+
+/* MOBILE ONLY */
+
+@media (max-width: 700px) {
+
+    .mobile-back-btn {
+        display: flex;
+
+        align-items: center;
+        justify-content: center;
+
+        width: 58px;
+        height: 58px;
+
+        margin: 12px 0 0 15px;
+
+        border: none;
+        border-radius: 50%;
+
+        background: #111;
+        color: white;
+
+        font-size: 34px;
+        font-weight: bold;
+
+        cursor: pointer;
+
+        box-shadow: 0 4px 12px rgba(0,0,0,0.18);
+
+        position: relative;
+        z-index: 100;
+    }
+
+    .mobile-back-btn:active {
+        transform: scale(0.92);
+    }
+
+}
