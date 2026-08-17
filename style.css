@@ -495,5 +495,52 @@ nav{
     }
 
 }
+    @media (max-width: 700px) {
+
+    header {
+        position: relative;
+        height: 65px;
+        padding: 0 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .logo {
+        font-size: 22px;
+        font-weight: bold;
+    }
+
+    .mobile-menu-btn {
+        display: block;
+        position: absolute;
+        left: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+
+        font-size: 28px;
+        cursor: pointer;
+    }
+
+    .cart-link {
+        position: absolute;
+        right: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+
+        font-size: 0;
+        padding: 8px;
+    }
+
+    .cart-link::before {
+        content: "🛒";
+        font-size: 25px;
+    }
+
+    header nav {
+        display: none;
+    }
+
+}
 
 }
